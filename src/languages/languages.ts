@@ -1,0 +1,28 @@
+export const languages = {
+  es: {
+    loginTitle: "Iniciar Sesión",
+    registerTitle: "Registro",
+    email: "Correo electrónico",
+    password: "Contraseña",
+    loginBtn: "Entrar",
+    registerBtn: "Crear cuenta",
+    goToRegister: "¿No tenés cuenta? Registrate",
+    goToLogin: "¿Ya tenés cuenta? Iniciar sesión",
+    welcome: "Bienvenido",
+    success: "Éxito",
+    error: "Error",
+  },
+  en: {
+    loginTitle: "Sign In",
+    registerTitle: "Register",
+    email: "Email",
+    password: "Password",
+    loginBtn: "Login",
+    registerBtn: "Create account",
+    goToRegister: "Don't have an account? Sign up",
+    goToLogin: "Already have an account? Sign in",
+    welcome: "Welcome",
+    success: "Success",
+    error: "Error",
+  },
+};
