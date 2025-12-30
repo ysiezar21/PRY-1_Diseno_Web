@@ -1,70 +1,169 @@
 import * as React from "react";
+import { Container, Snackbar, Alert } from "@mui/material";
+import type { Product } from "../api/dummyjson";
 import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@mui/material";
+  getCategoryList,
+  getProducts,
+  getProductsByCategory,
+  searchProducts,
+} from "../api/dummyjson";
+
+import TopNav from "../components/nav/TopNav";
+import CategoryDrawer from "../components/nav/CategoryDrawer";
+import HeroCarousel from "../components/carousels/HeroCarousel";
+import ProductRowCarousel from "../components/carousels/ProductRowCarousel";
 
 type Props = {
-  user: unknown; // o el tipo real de tu user (Firebase User)
+  user: unknown;
   lang: "es" | "en";
   setLang: (l: "es" | "en") => void;
   onLoginClick: () => void;
   onLogout: () => void;
 };
 
+type RowConfig = { title: string; category: string; limit: number };
+
+const pretty = (s: string) =>
+  s
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+
 export default function Home({ user, lang, setLang, onLoginClick, onLogout }: Props) {
   const isLogged = Boolean(user);
 
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [categories, setCategories] = React.useState<string[]>([]);
+  const [heroItems, setHeroItems] = React.useState<Product[]>([]);
+  const [rowsData, setRowsData] = React.useState<Record<string, Product[]>>({});
+  const [toast, setToast] = React.useState({ open: false, msg: "" });
+
+  // carrito mínimo (solo contador)
+  const [cart, setCart] = React.useState<Array<{ id: number; qty: number }>>([]);
+  const cartCount = cart.reduce((acc, x) => acc + x.qty, 0);
+
+  // Aca se pueden agregar facilmente mas filas
+  const rowsConfig: RowConfig[] = React.useMemo(
+    () => [
+      { title: "Smartphones", category: "smartphones", limit: 12 },
+      { title: "Groceries", category: "groceries", limit: 12 },
+      { title: "Home Decoration", category: "home-decoration", limit: 12 },
+      // se agregan más filas así:
+      // { title: "Laptops", category: "laptops", limit: 12 },
+    ],
+    []
+  );
+
+  // Cargar categorías + hero inicial
+  React.useEffect(() => {
+    const run = async () => {
+      const [cats, newest] = await Promise.all([getCategoryList(), getProducts(8, 0)]);
+      setCategories(cats);
+      setHeroItems(newest.products);
+    };
+
+    run().catch((e) => console.error(e));
+  }, []);
+
+  // Cargar productos para cada fila
+  React.useEffect(() => {
+    const run = async () => {
+      const uniqueCats = Array.from(new Set(rowsConfig.map((r) => r.category)));
+
+      const pairs = await Promise.all(
+        uniqueCats.map(async (cat) => {
+          try {
+            const res = await getProductsByCategory(cat, 12, 0);
+            return [cat, res.products] as const;
+          } catch {
+            return [cat, [] as Product[]] as const;
+          }
+        })
+      );
+
+      const obj = pairs.reduce<Record<string, Product[]>>(
+        (acc, [cat, prods]) => ({ ...acc, [cat]: prods }),
+        {}
+      );
+
+      setRowsData(obj);
+    };
+
+    run().catch((e) => console.error(e));
+  }, [rowsConfig]);
+
+  const addToCart = (p: Product) => {
+    setCart((prev) => {
+      const found = prev.find((x) => x.id === p.id);
+      return found
+        ? prev.map((x) => (x.id === p.id ? { ...x, qty: x.qty + 1 } : x))
+        : [...prev, { id: p.id, qty: 1 }];
+    });
+    setToast({ open: true, msg: `${lang === "en" ? "Added" : "Agregado"}: ${p.title}` });
+  };
+
+  const handlePickCategory = async (cat: string | null) => {
+    if (!cat) {
+      const res = await getProducts(8, 0);
+      setHeroItems(res.products);
+      return;
+    }
+    const res = await getProductsByCategory(cat, 8, 0);
+    setHeroItems(res.products);
+  };
+
+  const handleSearchSubmit = async (q: string) => {
+    if (!q) {
+      const res = await getProducts(8, 0);
+      setHeroItems(res.products);
+      return;
+    }
+    const res = await searchProducts(q, 8, 0);
+    setHeroItems(res.products);
+  };
+
   return (
-    <Box>
-      <AppBar position="sticky" elevation={0}>
-        <Toolbar sx={{ display: "flex", gap: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 800 }}>
-            SuperMercado
-          </Typography>
+    <>
+      <TopNav
+        isLogged={isLogged}
+        cartCount={cartCount}
+        lang={lang}
+        onLangChange={setLang}
+        onOpenDrawer={() => setDrawerOpen(true)}
+        onSearchSubmit={handleSearchSubmit}
+        onLoginClick={onLoginClick}
+        onLogout={onLogout}
+      />
 
-          <Box sx={{ flex: 1 }} />
+      <CategoryDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        categories={categories}
+        onPickCategory={handlePickCategory}
+      />
 
-          {/* Idioma (mínimo) */}
-          <ToggleButtonGroup
-            exclusive
-            value={lang}
-            onChange={(_, v) => v && setLang(v)}
-            size="small"
-            sx={{ bgcolor: "rgba(255,255,255,0.12)", borderRadius: 999 }}
-          >
-            <ToggleButton value="en">EN</ToggleButton>
-            <ToggleButton value="es">ES</ToggleButton>
-          </ToggleButtonGroup>
+      <Container sx={{ pb: 6 }}>
+        <HeroCarousel title={lang === "en" ? "New arrivals" : "Lo más nuevo"} items={heroItems} />
 
-          {/* Auth actions */}
-          {!isLogged ? (
-            <Button variant="contained" color="secondary" onClick={onLoginClick}>
-              Sign in
-            </Button>
-          ) : (
-            <Button variant="outlined" color="inherit" onClick={onLogout}>
-              Logout
-            </Button>
-          )}
-        </Toolbar>
-      </AppBar>
+        {rowsConfig.map((row) => (
+          <ProductRowCarousel
+            key={row.category}
+            title={pretty(row.title)}
+            products={rowsData[row.category] ?? []}
+            onAddToCart={addToCart}
+          />
+        ))}
+      </Container>
 
-      {/* Aquí va tu UI Walmart */}
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
-          Home (público)
-        </Typography>
-
-        <Typography sx={{ opacity: 0.8 }}>
-          Aquí van: carrusel grande + filas por categoría.
-        </Typography>
-      </Box>
-    </Box>
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={1400}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+      >
+        <Alert severity="success" variant="filled">
+          {toast.msg}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
