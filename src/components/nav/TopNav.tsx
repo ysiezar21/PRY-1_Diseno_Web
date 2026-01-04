@@ -29,6 +29,7 @@ type Props = {
   onLangChange: (l: "es" | "en") => void;
 
   onOpenDrawer: () => void;
+  onOpenCart: () => void;
   onSearchSubmit: (q: string) => void;
 
   onLoginClick: () => void;
@@ -41,6 +42,7 @@ export default function TopNav({
   lang,
   onLangChange,
   onOpenDrawer,
+  onOpenCart,
   onSearchSubmit,
   onLoginClick,
   onLogout,
@@ -140,7 +142,7 @@ export default function TopNav({
 
           {/* Carrito de compras con contador (Badge) */}
           <Tooltip title={lang === "en" ? "Cart" : "Carrito"}>
-            <IconButton color="inherit">
+            <IconButton color="inherit" onClick={onOpenCart}>
               <Badge badgeContent={cartCount} color="warning">
                 <ShoppingCartOutlinedIcon />
               </Badge>
