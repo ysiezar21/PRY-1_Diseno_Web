@@ -1,66 +1,82 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 import { useAuth } from "./auth/AuthProvider";
 import { logout } from "./auth/auth";
-import Home from "./pages/Home"; // falta por crear
+
+import MainLayout from "./layout/MainLayout";
+import Home from "./pages/Home";
+import Browse from "./pages/Browse";
+
+type Lang = "es" | "en";
+
+function LoginPage({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
+  const { user } = useAuth();
+  const nav = useNavigate();
+
+  useEffect(() => {
+    if (user) nav("/", { replace: true });
+  }, [user, nav]);
+
+  return (
+    <Login
+      goToRegister={() => nav("/register")}
+      lang={lang}
+      setLang={setLang}
+    />
+  );
+}
+
+function RegisterPage({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
+  const { user } = useAuth();
+  const nav = useNavigate();
+
+  useEffect(() => {
+    if (user) nav("/", { replace: true });
+  }, [user, nav]);
+
+  return (
+    <Register
+      goToLogin={() => nav("/login")}
+      lang={lang}
+      setLang={setLang}
+    />
+  );
+}
 
 export default function App() {
   const { user } = useAuth();
-
-  // ahora tiramos directamente la pantalla principal
-  const [view, setView] = useState<"home" | "login" | "register">("home");
-  // empezamos con ingles
-  const [lang, setLang] = useState<"es" | "en">("en");
-
-
-// Si el usuario se loguea, volvemos a home automáticamente
-  useEffect(() => {
-    if (user) setView("home");
-  }, [user]);
+  const [lang, setLang] = useState<Lang>("en");
 
   const handleLogout = async () => {
     try {
       await logout();
-      // home púnlico
-      setView("home");
     } catch (e) {
       console.error("Logout error:", e);
     }
   };
 
-  if (view === "login") {
-    return (
-      <Login
-        goToRegister={() => setView("register")}
-        lang={lang}
-        setLang={setLang}
-        // si tu Login NO tiene esta prop, no pasa nada: ver nota abajo
-        //goHome={() => setView("home")}
-      />
-    );
-  }
-
-  if (view === "register") {
-    return (
-      <Register
-        goToLogin={() => setView("login")}
-        lang={lang}
-        setLang={setLang}
-        // igual, opcional
-        //goHome={() => setView("home")}
-      />
-    );
-  }
-
-  // HOME siempre visible (público o logueado)
   return (
-    <Home
-      user={user}
-      lang={lang}
-      setLang={setLang}
-      onLoginClick={() => setView("login")}
-      onLogout={handleLogout}
-    />
+    <BrowserRouter>
+      <Routes>
+        {/* App "normal" con TopNav + drawers */}
+        <Route
+          element={<MainLayout user={user} lang={lang} setLang={setLang} onLogout={handleLogout} />}
+        >
+          <Route path="/" element={<Home lang={lang} />} />
+          <Route path="/products" element={<Browse mode="all" lang={lang} />} />
+          <Route path="/search" element={<Browse mode="search" lang={lang} />} />
+          <Route path="/category/:category" element={<Browse mode="category" lang={lang} />} />
+        </Route>
+
+        {/* Auth screens aparte (full-screen) */}
+        <Route path="/login" element={<LoginPage lang={lang} setLang={setLang} />} />
+        <Route path="/register" element={<RegisterPage lang={lang} setLang={setLang} />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

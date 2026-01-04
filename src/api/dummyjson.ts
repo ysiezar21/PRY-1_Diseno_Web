@@ -1,17 +1,24 @@
 const BASE = "https://dummyjson.com";
 
-// export de tipos de productos
+// Tipos de productos (DummyJSON trae muchos más campos; acá listamos los que usamos en UI)
 export type Product = {
   id: number;
   title: string;
   price: number;
   category: string;
   thumbnail: string;
+
+  description?: string;
+  brand?: string;
+  stock?: number;
+
   rating?: number;
   discountPercentage?: number;
+
+  images?: string[];
 };
 
-// export de respuesta de productos, esto incluye la paginación de los productos
+// Respuesta paginada
 export type ProductsResponse = {
   products: Product[];
   total: number;
@@ -19,22 +26,22 @@ export type ProductsResponse = {
   limit: number;
 };
 
-// promise genérica para fetch
+// fetch genérico
 const fetchJson = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
   return res.json() as Promise<T>;
 };
 
-// export de categorías para productos
+// categorías
 export const getCategoryList = (): Promise<string[]> =>
   fetchJson(`${BASE}/products/category-list`);
 
-// export de productos, get para traer productos
+// productos (paginado)
 export const getProducts = (limit = 12, skip = 0): Promise<ProductsResponse> =>
   fetchJson(`${BASE}/products?limit=${limit}&skip=${skip}`);
 
-// productos x categoría
+// productos por categoría (paginado)
 export const getProductsByCategory = (
   category: string,
   limit = 12,
@@ -44,10 +51,33 @@ export const getProductsByCategory = (
     `${BASE}/products/category/${encodeURIComponent(category)}?limit=${limit}&skip=${skip}`
   );
 
-// export de productos, búsqueda
+// búsqueda (paginado)
 export const searchProducts = (
   q: string,
   limit = 12,
   skip = 0
 ): Promise<ProductsResponse> =>
   fetchJson(`${BASE}/products/search?q=${encodeURIComponent(q)}&limit=${limit}&skip=${skip}`);
+
+// -------- Helpers para traer TODOS los resultados (DummyJSON tiene un catálogo pequeño) --------
+const fetchAll = async (fn: (limit: number, skip: number) => Promise<ProductsResponse>) => {
+  const limit = 100;
+  let skip = 0;
+  let all: Product[] = [];
+
+  while (true) {
+    const res = await fn(limit, skip);
+    all = all.concat(res.products);
+    skip += res.limit;
+    if (skip >= res.total) break;
+  }
+
+  return all;
+};
+
+export const getAllProducts = () => fetchAll((l, s) => getProducts(l, s));
+
+export const getAllProductsByCategory = (category: string) =>
+  fetchAll((l, s) => getProductsByCategory(category, l, s));
+
+export const searchAllProducts = (q: string) => fetchAll((l, s) => searchProducts(q, l, s));
