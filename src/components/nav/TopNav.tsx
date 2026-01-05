@@ -20,6 +20,8 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import Brightness4Icon from '@mui/icons-material/Brightness4'; // Luna
+import Brightness7Icon from '@mui/icons-material/Brightness7'; // Sol
 
 // Definición de tipos para las propiedades (Props)
 type Props = {
@@ -34,6 +36,9 @@ type Props = {
 
   onLoginClick: () => void;
   onLogout: () => void;
+
+  onToggleTheme: () => void;
+  currentMode: "light" | "dark";
 };
 
 export default function TopNav({
@@ -46,6 +51,8 @@ export default function TopNav({
   onSearchSubmit,
   onLoginClick,
   onLogout,
+  onToggleTheme,
+  currentMode,
 }: Props) {
   // Estado local para almacenar el texto de búsqueda
   const [q, setQ] = React.useState("");
@@ -58,7 +65,7 @@ export default function TopNav({
 
   return (
     // Barra de navegación superior (sticky = se queda fija al hacer scroll)
-    <AppBar position="sticky" elevation={0} sx={{ bgcolor: "#0071ce" }}>
+    <AppBar position="sticky" elevation={0} sx={{ bgcolor: "primary.main" }}>
       <Toolbar sx={{ gap: 2 }}>
         {/* Botón de menú hamburguesa para abrir el panel lateral */}
         <IconButton color="inherit" onClick={onOpenDrawer} edge="start">
@@ -103,6 +110,10 @@ export default function TopNav({
             </IconButton>
           </Paper>
         </Box>
+
+        <IconButton sx={{ ml: 1}} onClick={onToggleTheme} color="inherit">
+          {currentMode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
 
         {/* Selector de idioma (Español / Inglés) TODO */}
         <ToggleButtonGroup
