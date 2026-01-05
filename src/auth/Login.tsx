@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { login } from "./auth";
 import { languages } from "../languages/languages";
 
@@ -12,13 +13,19 @@ export default function Login({ goToRegister, lang, setLang }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = (location.state as any)?.from || "/";
+
   const t = languages[lang];
 
   const handleLogin = async () => {
     try {
       await login(email, password);
+      navigate(from, { replace: true }); 
     } catch {
-      alert("Error");
+      alert("Error al iniciar sesión");
     }
   };
 
