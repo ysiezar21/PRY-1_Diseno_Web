@@ -72,7 +72,7 @@ export default function App() {
           <Route path="/search" element={<Browse mode="search" lang={lang} />} />
           <Route path="/category/:category" element={<Browse mode="category" lang={lang} />} />
 
-          {/* ✅ ESTA RUTA NO EXISTÍA */}
+          
           <Route path="/checkout" element={<CheckoutPage />} />
         </Route>
 
