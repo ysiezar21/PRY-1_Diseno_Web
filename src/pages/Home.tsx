@@ -91,6 +91,7 @@ export default function Home({ lang }: Props) {
 
         {rowsConfig.map((row) => (
           <ProductRowCarousel
+            lang={lang}
             key={row.category}
             title={pretty(row.title)}
             products={rowsData[row.category] ?? []}
