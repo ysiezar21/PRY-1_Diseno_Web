@@ -1,3 +1,5 @@
+// --- START OF FILE src/App.tsx ---
+
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
@@ -9,9 +11,17 @@ import { logout } from "./auth/auth";
 import MainLayout from "./layout/MainLayout";
 import Home from "./pages/Home";
 import Browse from "./pages/Browse";
+import CheckoutPage from "./pages/CheckoutPage"; 
 
 type Lang = "es" | "en";
 
+// Definimos las props del tema
+type AppProps = {
+  toggleTheme: () => void;
+  mode: "light" | "dark";
+};
+
+// Componente auxiliar limpio para Login
 function LoginPage({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
   const { user } = useAuth();
   const nav = useNavigate();
@@ -20,15 +30,10 @@ function LoginPage({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }
     if (user) nav("/", { replace: true });
   }, [user, nav]);
 
-  return (
-    <Login
-      goToRegister={() => nav("/register")}
-      lang={lang}
-      setLang={setLang}
-    />
-  );
+  return <Login goToRegister={() => nav("/register")} lang={lang} setLang={setLang} />;
 }
 
+// Componente auxiliar limpio para Register
 function RegisterPage({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
   const { user } = useAuth();
   const nav = useNavigate();
@@ -37,16 +42,11 @@ function RegisterPage({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => voi
     if (user) nav("/", { replace: true });
   }, [user, nav]);
 
-  return (
-    <Register
-      goToLogin={() => nav("/login")}
-      lang={lang}
-      setLang={setLang}
-    />
-  );
+  return <Register goToLogin={() => nav("/login")} lang={lang} setLang={setLang} />;
 }
 
-export default function App() {
+// Componente Principal arreglado
+export default function App({ toggleTheme, mode }: AppProps) {
   const { user } = useAuth();
   const [lang, setLang] = useState<Lang>("en");
 
@@ -61,20 +61,34 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* App "normal" con TopNav + drawers */}
+        {/* Layout Principal que envuelve las páginas de la tienda */}
         <Route
-          element={<MainLayout user={user} lang={lang} setLang={setLang} onLogout={handleLogout} />}
+          element={
+            <MainLayout 
+              user={user} 
+              lang={lang} 
+              setLang={setLang} 
+              onLogout={handleLogout}
+              // Pasamos las props del tema correctamente
+              toggleTheme={toggleTheme}
+              mode={mode}
+            />
+          }
         >
           <Route path="/" element={<Home lang={lang} />} />
           <Route path="/products" element={<Browse mode="all" lang={lang} />} />
           <Route path="/search" element={<Browse mode="search" lang={lang} />} />
           <Route path="/category/:category" element={<Browse mode="category" lang={lang} />} />
+          
+          {/* Tu ruta de Checkout recuperada */}
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Route>
 
-        {/* Auth screens aparte (full-screen) */}
+        {/* Pantallas de Autenticación */}
         <Route path="/login" element={<LoginPage lang={lang} setLang={setLang} />} />
         <Route path="/register" element={<RegisterPage lang={lang} setLang={setLang} />} />
 
+        {/* Redirección por defecto */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

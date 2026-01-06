@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { register } from "./auth";
 import { languages } from "../languages/languages";
 
@@ -9,18 +10,21 @@ interface Props {
 }
 
 export default function Register({ goToLogin, lang, setLang }: Props) {
-  // Estados para los inputs
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Textos según idioma
+  const navigate = useNavigate();
+  const location = useLocation();
+
+
+  const from = (location.state as any)?.from || "/";
+
   const t = languages[lang];
 
   const handleRegister = async () => {
     try {
       await register(email, password);
-      alert(t.success);
-      goToLogin();
+      navigate(from, { replace: true }); 
     } catch (error) {
       alert(t.error);
       console.error(error);

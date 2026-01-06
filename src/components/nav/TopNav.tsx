@@ -13,13 +13,14 @@ import {
   Tooltip,
   Button,
 } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import Brightness4Icon from '@mui/icons-material/Brightness4'; // Luna
+import Brightness7Icon from '@mui/icons-material/Brightness7'; // Sol
 
 // Definición de tipos para las propiedades (Props)
 type Props = {
@@ -34,6 +35,9 @@ type Props = {
 
   onLoginClick: () => void;
   onLogout: () => void;
+
+  onToggleTheme: () => void;
+  currentMode: "light" | "dark";
 };
 
 export default function TopNav({
@@ -46,9 +50,12 @@ export default function TopNav({
   onSearchSubmit,
   onLoginClick,
   onLogout,
+  onToggleTheme,
+  currentMode,
 }: Props) {
   // Estado local para almacenar el texto de búsqueda
   const [q, setQ] = React.useState("");
+  const navigate = useNavigate();
 
   // Manejador del envío del formulario de búsqueda
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,7 +65,7 @@ export default function TopNav({
 
   return (
     // Barra de navegación superior (sticky = se queda fija al hacer scroll)
-    <AppBar position="sticky" elevation={0} sx={{ bgcolor: "#0071ce" }}>
+    <AppBar position="sticky" elevation={0} sx={{ bgcolor: "primary.main" }}>
       <Toolbar sx={{ gap: 2 }}>
         {/* Botón de menú hamburguesa para abrir el panel lateral */}
         <IconButton color="inherit" onClick={onOpenDrawer} edge="start">
@@ -66,9 +73,21 @@ export default function TopNav({
         </IconButton>
 
         {/* Nombre de tienda*/}
-        <Typography variant="h6" sx={{ fontWeight: 900, whiteSpace: "nowrap" }}>
+        <Typography
+          variant="h6"
+          onClick={() => navigate("/")}
+          sx={{
+            fontWeight: 900,
+            whiteSpace: "nowrap",
+            cursor: "pointer",
+            "&:hover": {
+              opacity: 0.85,
+            },
+          }}
+        >
           SuperMercado
         </Typography>
+
 
         {/* Contenedor de la barra de búsqueda */}
         <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: "flex" }}>
@@ -104,6 +123,10 @@ export default function TopNav({
           </Paper>
         </Box>
 
+        <IconButton sx={{ ml: 1}} onClick={onToggleTheme} color="inherit">
+          {currentMode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
+
         {/* Selector de idioma (Español / Inglés) TODO */}
         <ToggleButtonGroup
           exclusive
@@ -122,11 +145,6 @@ export default function TopNav({
 
         {/* Grupo de iconos de usuario (Listas, Cuenta, Pedidos, Carrito) */}
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-          <Tooltip title={lang === "en" ? "My lists" : "Mis listas"}>
-            <IconButton color="inherit">
-              <FavoriteBorderIcon />
-            </IconButton>
-          </Tooltip>
 
           <Tooltip title={lang === "en" ? "My account" : "Mi cuenta"}>
             <IconButton color="inherit">
