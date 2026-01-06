@@ -87,27 +87,28 @@ export default function CheckoutPage() {
     );
   }
 
-  // ================== Estilo para los inputs ==================
-  const inputStyle = {
+  // ================== Estilo dinámico para los inputs ==================
+  // Uso 'divider' para el borde, así se adapta al tema claro/oscuro
+  const inputSx = {
     flex: 1,
     px: 1,
     py: 0.5,
-    border: "1px solid #ccc",
+    border: 1,
+    borderColor: "divider", 
     borderRadius: 1,
     minWidth: 0,
-  };
-
-  const buttonBlueStyle = {
-    color: "white",
-    backgroundColor: "blue",
-    "&:hover": { backgroundColor: "#0051b3" },
+    // quite colores fijos/hardcodeados
+    color: "text.primary",
+    bgcolor: "background.paper"
   };
 
   return (
     <Box
       sx={{
         p: { xs: 2, md: 4 },
-        backgroundColor: "#f5f5f5",
+        // aqui quite los colores fijos
+        bgcolor: "background.default", 
+        color: "text.primary",
         minHeight: "100vh",
       }}
     >
@@ -117,7 +118,11 @@ export default function CheckoutPage() {
           <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>Productos</Typography>
           <Stack spacing={2}>
             {items.map(({ product, qty }) => (
-              <Paper key={product.id} sx={{ p: 2, display: "flex", alignItems: "center", gap: 2 }}>
+              <Paper 
+                key={product.id} 
+                sx={{ p: 2, display: "flex", alignItems: "center", gap: 2 }}
+                // Paper para que se adapte a los temas
+              >
                 <Avatar variant="rounded" src={product.thumbnail} sx={{ width: 90, height: 90 }} />
                 <Box sx={{ flex: 1 }}>
                   <Typography sx={{ fontWeight: 800 }}>{product.title}</Typography>
@@ -155,7 +160,8 @@ export default function CheckoutPage() {
                 <Typography sx={{ fontWeight: 900 }}>{money(total)}</Typography>
               </Box>
             </Stack>
-            <Button variant="contained" fullWidth sx={{ mt: 3 }} onClick={handleCheckout}>
+            {/* Usamos color="primary" en lugar de estilos manuales azules */}
+            <Button variant="contained" color="primary" fullWidth sx={{ mt: 3 }} onClick={handleCheckout}>
               Finalizar compra
             </Button>
           </Paper>
@@ -171,27 +177,27 @@ export default function CheckoutPage() {
               value={cardNumber}
               onChange={(e) => setCardNumber(e.target.value)}
               placeholder="Número de tarjeta"
-              sx={inputStyle}
+              sx={inputSx}
             />
             <InputBase
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
               placeholder="Nombre en la tarjeta"
-              sx={inputStyle}
+              sx={inputSx}
             />
             <Box sx={{ display: "flex", gap: 2 }}>
               <InputBase
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
                 placeholder="MM"
-                sx={{ ...inputStyle, flex: 1 }}
+                sx={{ ...inputSx, flex: 1 }}
                 inputProps={{ maxLength: 2 }}
               />
               <InputBase
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 placeholder="AA"
-                sx={{ ...inputStyle, flex: 1 }}
+                sx={{ ...inputSx, flex: 1 }}
                 inputProps={{ maxLength: 2 }}
               />
             </Box>
@@ -199,17 +205,17 @@ export default function CheckoutPage() {
               value={cvv}
               onChange={(e) => setCvv(e.target.value)}
               placeholder="CVV"
-              sx={inputStyle}
+              sx={inputSx}
               inputProps={{ maxLength: 4 }}
             />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelPayment} sx={buttonBlueStyle}>Cancelar</Button>
+          {/* Botones nativos para que tomen los colores del tema */}
+          <Button onClick={handleCancelPayment} color="inherit">Cancelar</Button>
           <Button
             variant="contained"
             onClick={handleConfirmPayment}
-            sx={buttonBlueStyle}
             disabled={!isPaymentValid()}
           >
             Pagar
