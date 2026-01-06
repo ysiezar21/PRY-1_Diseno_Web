@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogContent,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -38,7 +39,10 @@ type Props = {
 };
 
 const money = (n: number) =>
-  new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n || 0);
+  new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "USD",
+  }).format(n || 0);
 
 export default function CartDrawer({
   open,
@@ -52,13 +56,34 @@ export default function CartDrawer({
   onClear,
 }: Props) {
   const [detail, setDetail] = React.useState<Product | null>(null);
+  const navigate = useNavigate();
+
+  // ✅ FUNCIÓN CORRECTA
+  const handleContinue = () => {
+    onClose();              // cerrar carrito
+    navigate("/checkout");  // ir a checkout
+  };
 
   return (
     <>
       <Drawer anchor="right" open={open} onClose={onClose}>
-        <Box sx={{ width: { xs: 340, sm: 420 }, height: "100%", display: "flex", flexDirection: "column" }}>
-          {/* Header */}
-          <Box sx={{ p: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            width: { xs: 340, sm: 420 },
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {/* HEADER */}
+          <Box
+            sx={{
+              p: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 900 }}>
                 {lang === "en" ? "Cart" : "Carrito"}
@@ -69,19 +94,19 @@ export default function CartDrawer({
                     ? "No items yet"
                     : "Aún no hay productos"
                   : lang === "en"
-                    ? `${items.length} item(s)`
-                    : `${items.length} producto(s)`}
+                  ? `${items.length} item(s)`
+                  : `${items.length} producto(s)`}
               </Typography>
             </Box>
 
-            <IconButton onClick={onClose} aria-label="close">
+            <IconButton onClick={onClose}>
               <CloseIcon />
             </IconButton>
           </Box>
 
           <Divider />
 
-          {/* Body */}
+          {/* BODY */}
           <List sx={{ flex: 1, overflow: "auto" }}>
             {items.map(({ product, qty }) => (
               <ListItem key={product.id} disableGutters sx={{ px: 2, py: 1 }}>
@@ -89,36 +114,55 @@ export default function CartDrawer({
                   <Avatar
                     variant="rounded"
                     src={product.thumbnail}
-                    alt={product.title}
-                    sx={{ width: 72, height: 72, flex: "0 0 auto" }}
+                    sx={{ width: 72, height: 72 }}
                   />
 
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Box sx={{ flex: 1 }}>
                     <Typography
                       sx={{ fontWeight: 800, cursor: "pointer" }}
                       noWrap
-                      title={product.title}
                       onClick={() => setDetail(product)}
                     >
                       {product.title}
                     </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.75 }} noWrap>
+
+                    <Typography variant="body2" sx={{ opacity: 0.75 }}>
                       {product.category}
                     </Typography>
-                    <Typography sx={{ fontWeight: 900, mt: 0.25 }}>{money(product.price)}</Typography>
 
-                    <Stack direction="row" spacing={1} sx={{ mt: 1, alignItems: "center" }}>
-                      <IconButton size="small" onClick={() => onDec(product.id)} aria-label="decrease">
+                    <Typography sx={{ fontWeight: 900 }}>
+                      {money(product.price)}
+                    </Typography>
+
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ mt: 1, alignItems: "center" }}
+                    >
+                      <IconButton
+                        size="small"
+                        onClick={() => onDec(product.id)}
+                      >
                         <RemoveIcon fontSize="small" />
                       </IconButton>
-                      <Typography sx={{ minWidth: 20, textAlign: "center", fontWeight: 800 }}>{qty}</Typography>
-                      <IconButton size="small" onClick={() => onInc(product.id)} aria-label="increase">
+
+                      <Typography sx={{ fontWeight: 800 }}>
+                        {qty}
+                      </Typography>
+
+                      <IconButton
+                        size="small"
+                        onClick={() => onInc(product.id)}
+                      >
                         <AddIcon fontSize="small" />
                       </IconButton>
 
                       <Box sx={{ flex: 1 }} />
 
-                      <IconButton size="small" onClick={() => onRemove(product.id)} aria-label="remove">
+                      <IconButton
+                        size="small"
+                        onClick={() => onRemove(product.id)}
+                      >
                         <DeleteOutlineIcon fontSize="small" />
                       </IconButton>
                     </Stack>
@@ -131,8 +175,8 @@ export default function CartDrawer({
               <Box sx={{ p: 3 }}>
                 <Typography sx={{ opacity: 0.75 }}>
                   {lang === "en"
-                    ? "Add products with the + Add button and they will appear here."
-                    : "Agregá productos con el botón + Agregar y aparecerán acá."}
+                    ? "Add products and they will appear here."
+                    : "Agregá productos y aparecerán acá."}
                 </Typography>
               </Box>
             )}
@@ -140,14 +184,24 @@ export default function CartDrawer({
 
           <Divider />
 
-          {/* Footer */}
+          {/* FOOTER */}
           <Box sx={{ p: 2 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-              <Typography sx={{ fontWeight: 800 }}>{lang === "en" ? "Subtotal" : "Subtotal"}</Typography>
-              <Typography sx={{ fontWeight: 900 }}>{money(subtotal)}</Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mb: 1,
+              }}
+            >
+              <Typography sx={{ fontWeight: 800 }}>
+                Subtotal
+              </Typography>
+              <Typography sx={{ fontWeight: 900 }}>
+                {money(subtotal)}
+              </Typography>
             </Box>
 
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+            <Stack spacing={1}>
               <Button
                 variant="outlined"
                 fullWidth
@@ -156,14 +210,13 @@ export default function CartDrawer({
               >
                 {lang === "en" ? "Clear" : "Vaciar"}
               </Button>
+
+              {/* ✅ BOTÓN ARREGLADO */}
               <Button
                 variant="contained"
                 fullWidth
                 disabled={items.length === 0}
-                onClick={() => {
-                  // Por ahora solo UX (no hay checkout real)
-                  onClose();
-                }}
+                onClick={handleContinue}
               >
                 {lang === "en" ? "Continue" : "Continuar"}
               </Button>
@@ -172,41 +225,17 @@ export default function CartDrawer({
         </Box>
       </Drawer>
 
-      {/* Modal de detalles (cumple "ver detalles" del carro sin routing aún) */}
-      <Dialog open={Boolean(detail)} onClose={() => setDetail(null)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ fontWeight: 900 }}>
+      {/* MODAL DETALLE */}
+      <Dialog open={Boolean(detail)} onClose={() => setDetail(null)}>
+        <DialogTitle>
           {lang === "en" ? "Product details" : "Detalles del producto"}
         </DialogTitle>
         <DialogContent>
           {detail && (
-            <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
-              <Avatar
-                variant="rounded"
-                src={detail.thumbnail}
-                alt={detail.title}
-                sx={{ width: 120, height: 120, flex: "0 0 auto" }}
-              />
-              <Box sx={{ flex: 1 }}>
-                <Typography sx={{ fontWeight: 900 }}>{detail.title}</Typography>
-                <Typography variant="body2" sx={{ opacity: 0.75 }}>
-                  {detail.category}
-                </Typography>
-                <Typography sx={{ fontWeight: 900, mt: 1 }}>{money(detail.price)}</Typography>
-                {typeof detail.discountPercentage === "number" && (
-                  <Typography variant="body2" sx={{ mt: 0.5 }}>
-                    {lang === "en" ? "Discount" : "Descuento"}: {detail.discountPercentage}%
-                  </Typography>
-                )}
-                {typeof detail.rating === "number" && (
-                  <Typography variant="body2">{lang === "en" ? "Rating" : "Calificación"}: {detail.rating}</Typography>
-                )}
-              </Box>
-            </Box>
+            <Typography sx={{ fontWeight: 900 }}>
+              {detail.title}
+            </Typography>
           )}
-
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-            <Button onClick={() => setDetail(null)}>{lang === "en" ? "Close" : "Cerrar"}</Button>
-          </Box>
         </DialogContent>
       </Dialog>
     </>

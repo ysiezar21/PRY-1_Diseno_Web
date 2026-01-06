@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Card, CardMedia, CardContent, Typography, CardActions, Button } from "@mui/material";
 import type { Product } from "../api/dummyjson";
 
