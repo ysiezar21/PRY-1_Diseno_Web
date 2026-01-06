@@ -12,9 +12,12 @@ type Props = {
   lang: "es" | "en";
   setLang: (l: "es" | "en") => void;
   onLogout: () => void;
+
+  toggleTheme: () => void;
+  mode: "light" | "dark";
 };
 
-export default function MainLayout({ user, lang, setLang, onLogout }: Props) {
+export default function MainLayout({ user, lang, setLang, onLogout, toggleTheme, mode }: Props) {
   const isLogged = Boolean(user);
   const nav = useNavigate();
 
@@ -67,6 +70,8 @@ export default function MainLayout({ user, lang, setLang, onLogout }: Props) {
         onSearchSubmit={goSearch}
         onLoginClick={() => nav("/login")}
         onLogout={onLogout}
+        onToggleTheme={toggleTheme}
+        currentMode={mode}
       />
 
       <CategoryDrawer
