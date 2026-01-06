@@ -13,10 +13,9 @@ import {
   Tooltip,
   Button,
 } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
@@ -56,6 +55,7 @@ export default function TopNav({
 }: Props) {
   // Estado local para almacenar el texto de búsqueda
   const [q, setQ] = React.useState("");
+  const navigate = useNavigate();
 
   // Manejador del envío del formulario de búsqueda
   const handleSubmit = (e: React.FormEvent) => {
@@ -73,9 +73,21 @@ export default function TopNav({
         </IconButton>
 
         {/* Nombre de tienda*/}
-        <Typography variant="h6" sx={{ fontWeight: 900, whiteSpace: "nowrap" }}>
+        <Typography
+          variant="h6"
+          onClick={() => navigate("/")}
+          sx={{
+            fontWeight: 900,
+            whiteSpace: "nowrap",
+            cursor: "pointer",
+            "&:hover": {
+              opacity: 0.85,
+            },
+          }}
+        >
           SuperMercado
         </Typography>
+
 
         {/* Contenedor de la barra de búsqueda */}
         <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: "flex" }}>
@@ -133,11 +145,6 @@ export default function TopNav({
 
         {/* Grupo de iconos de usuario (Listas, Cuenta, Pedidos, Carrito) */}
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-          <Tooltip title={lang === "en" ? "My lists" : "Mis listas"}>
-            <IconButton color="inherit">
-              <FavoriteBorderIcon />
-            </IconButton>
-          </Tooltip>
 
           <Tooltip title={lang === "en" ? "My account" : "Mi cuenta"}>
             <IconButton color="inherit">

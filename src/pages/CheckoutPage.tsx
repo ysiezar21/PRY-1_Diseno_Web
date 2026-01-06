@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   Box,
-  Grid,
   Typography,
   Paper,
   Button,
@@ -14,6 +13,7 @@ import {
   DialogActions,
   InputBase,
 } from "@mui/material";
+// Usamos `Box` para el layout responsive para evitar conflictos de tipos con Grid
 import { useNavigate } from "react-router-dom";
 
 import { useCart } from "../cart/CartProvider";
@@ -30,8 +30,15 @@ export default function CheckoutPage() {
   const { user } = useAuth(); 
   const navigate = useNavigate();
 
+  const descuento = items.reduce((acc, { product, qty }) => {
+    const porcentaje = product.discountPercentage ?? 0;
+    const descuentoProducto =
+      (product.price * porcentaje / 100) * qty;
+
+    return acc + descuentoProducto;
+  }, 0);
   const shipping = items.length > 0 ? 5 : 0;
-  const total = subtotal + shipping;
+  const total = subtotal + shipping - descuento;
 
   const [openPayment, setOpenPayment] = React.useState(false);
   const [cardNumber, setCardNumber] = React.useState("");
@@ -39,15 +46,19 @@ export default function CheckoutPage() {
   const [month, setMonth] = React.useState("");
   const [year, setYear] = React.useState("");
   const [cvv, setCvv] = React.useState("");
+  const [openSuccess, setOpenSuccess] = React.useState(false);
+  const [openLoginRequired, setOpenLoginRequired] = React.useState(false);
+
 
   const handleCheckout = () => {
     if (!user) {
-      alert("Debes iniciar sesión para finalizar la compra");
-      navigate("/login");
+      setOpenLoginRequired(true);
       return;
     }
+
     setOpenPayment(true);
   };
+
 
   const isPaymentValid = () => {
     const monthNum = parseInt(month, 10);
@@ -69,23 +80,16 @@ export default function CheckoutPage() {
       alert("Por favor completa todos los campos correctamente");
       return;
     }
-    alert("Pago realizado con éxito 🎉");
+
     clear();
     setOpenPayment(false);
-    navigate("/");
+    setOpenSuccess(true);
   };
+
 
   const handleCancelPayment = () => {
     setOpenPayment(false);
   };
-
-  if (items.length === 0) {
-    return (
-      <Box sx={{ p: 4 }}>
-        <Typography variant="h6">No hay productos seleccionados</Typography>
-      </Box>
-    );
-  }
 
   // ================== Estilo dinámico para los inputs ==================
   // Uso 'divider' para el borde, así se adapta al tema claro/oscuro
@@ -112,9 +116,9 @@ export default function CheckoutPage() {
         minHeight: "100vh",
       }}
     >
-      <Grid container spacing={4}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4, justifyContent: "center" }}>
         {/* Productos */}
-        <Grid item xs={12} md={9}>
+        <Box sx={{ width: { xs: "100%", md: "75%" } }}>
           <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>Productos</Typography>
           <Stack spacing={2}>
             {items.map(({ product, qty }) => (
@@ -139,10 +143,10 @@ export default function CheckoutPage() {
               </Paper>
             ))}
           </Stack>
-        </Grid>
+        </Box>
 
         {/* Resumen */}
-        <Grid item xs={12} md={3}>
+        <Box sx={{ width: { xs: "100%", md: "25%" } }}>
           <Paper sx={{ p: 3, position: "sticky", top: 140 }}>
             <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>Resumen</Typography>
             <Stack spacing={1.5}>
@@ -153,6 +157,10 @@ export default function CheckoutPage() {
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography>Envío</Typography>
                 <Typography>{money(shipping)}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography>Descuento</Typography>
+                <Typography>-{money(descuento)}</Typography>
               </Box>
               <Divider />
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -165,8 +173,8 @@ export default function CheckoutPage() {
               Finalizar compra
             </Button>
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Modal de pago */}
       <Dialog open={openPayment} onClose={handleCancelPayment}>
@@ -219,6 +227,57 @@ export default function CheckoutPage() {
             disabled={!isPaymentValid()}
           >
             Pagar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Modal de éxito */}
+      <Dialog
+        open={openSuccess}
+        onClose={() => {}}>
+        <DialogTitle sx={{ fontWeight: 900 }}>
+          ¡Pago realizado!
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography sx={{ mt: 1 }}>
+            Tu compra se realizó con éxito 🎉  
+            Gracias por confiar en nosotros.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setOpenSuccess(false);
+              navigate("/");
+            }}
+          >
+            Aceptar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Modal de inicio de sesión requerido */}
+      <Dialog open={openLoginRequired}>
+        <DialogTitle sx={{ fontWeight: 900 }}>
+          Inicio de sesión requerido
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography sx={{ mt: 1 }}>
+            Debes iniciar sesión para finalizar la compra.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setOpenLoginRequired(false);
+              navigate("/login");
+            }}
+            variant="contained"
+          >
+            Aceptar
           </Button>
         </DialogActions>
       </Dialog>
