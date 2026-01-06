@@ -14,7 +14,6 @@ import {
   Switch,
   FormControlLabel,
   Button,
-  Grid,
   Pagination,
   CircularProgress,
   Drawer,
@@ -380,20 +379,28 @@ export default function Browse({ mode, lang }: Props) {
               </Box>
             ) : (
               <>
-                <Grid container spacing={2}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
                   {view.map((p) => (
-                    <Grid key={p.id} item xs={12} sm={6} md={4} lg={3}>
+                    <Box key={p.id}
+                      sx={{
+                        width: { xs: "100%", sm: "calc(50% - 16px)", md: "calc(33.333% - 16px)", lg: "calc(25% - 16px)" },
+                      }}
+                    >
                       <ProductGridCard
                         product={p}
                         lang={lang}
                         onAddToCart={(prod) => {
                           add(prod);
-                          setToast({ open: true, msg: `${lang === "en" ? "Added" : "Agregado"}: ${prod.title}` });
+                          setToast({
+                            open: true,
+                            msg: `${lang === "en" ? "Added" : "Agregado"}: ${prod.title}`,
+                          });
                         }}
                       />
-                    </Grid>
+                    </Box>
                   ))}
-                </Grid>
+                </Box>
+
 
                 {filtered.length === 0 && (
                   <Box sx={{ py: 6, textAlign: "center" }}>
