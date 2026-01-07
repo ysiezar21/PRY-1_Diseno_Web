@@ -35,11 +35,12 @@ export default function Home({ lang }: Props) {
   // Configuración de filas
   const rowsConfig: RowConfig[] = React.useMemo(
     () => [
-      { title: "Smartphones", category: "smartphones", limit: 12 },
-      { title: "Groceries", category: "groceries", limit: 12 },
-      { title: "Home Decoration", category: "home-decoration", limit: 12 },
+      { title: t.smartphones, category: "smartphones", limit: 12 },
+      { title: t.groceries, category: "groceries", limit: 12 },
+      { title: t.homeDecoration, category: "home-decoration", limit: 12 },
+      
     ],
-    []
+    [t]
   );
 
   // Cargar hero inicial
@@ -90,7 +91,7 @@ export default function Home({ lang }: Props) {
           </Button>
         </Box>
 
-        <HeroCarousel title={t.heroTitle} items={heroItems} />
+        <HeroCarousel title={t.heroTitle} items={heroItems} lang={lang} />
 
         {rowsConfig.map((row) => (
           <ProductRowCarousel

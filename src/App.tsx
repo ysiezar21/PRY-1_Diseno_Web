@@ -81,7 +81,7 @@ export default function App({ toggleTheme, mode }: AppProps) {
           <Route path="/category/:category" element={<Browse mode="category" lang={lang} />} />
           
           {/* Tu ruta de Checkout recuperada */}
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/checkout" element={<CheckoutPage lang = {lang} />} />
         </Route>
 
         {/* Pantallas de Autenticación */}

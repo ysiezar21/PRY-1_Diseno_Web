@@ -15,7 +15,7 @@ export default function HeroCarousel({ title, items, lang }: Props) {
   const [i, setI] = React.useState(0);
   const max = items.length;
 
-  const t = languages[lang || "es"];
+  const t = languages[lang || "en"];
 
   const prev = () => setI((x) => (max === 0 ? 0 : (x - 1 + max) % max));
   const next = () => setI((x) => (max === 0 ? 0 : (x + 1) % max));

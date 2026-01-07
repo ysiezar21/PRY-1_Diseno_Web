@@ -50,6 +50,7 @@ export const languages = {
       newProducts: "Nuevos productos",
       bestSellers: "Más vendidos",
       recommended: "Recomendados",
+      
     },
 
     cartDrawer: {
@@ -103,7 +104,7 @@ export const languages = {
       cancel: "Cancelar",
       pay: "Pagar",
       successTitle: "¡Pago realizado!",
-      successMessage: "Tu compra se realizó con éxito 🎉 Gracias por confiar en nosotros.",
+      successMessage: "Tu compra se realizó con éxito, gracias por confiar en nosotros.",
       loginRequiredTitle: "Inicio de sesión requerido",
       loginRequiredMessage: "Debes iniciar sesión para finalizar la compra.",
       accept: "Aceptar",
@@ -114,6 +115,9 @@ export const languages = {
       browseCatalog: "Ver catálogo",
       heroTitle: "Lo más nuevo",
       added: "Agregado",
+      smartphones: "Celulares",
+      groceries: "Alimentos",
+      homeDecoration: "Decoración del hogar",
     },
 
     catalog: {
@@ -146,7 +150,7 @@ export const languages = {
       cart: "Cart",
       signIn: "Sign in",
       logout: "Logout",
-      storeName: "SuperMarket",
+      storeName: "SuperMercado",
     },
 
     categoryDrawer: {
@@ -174,6 +178,7 @@ export const languages = {
       newProducts: "New Products",
       bestSellers: "Best Sellers",
       recommended: "Recommended",
+      
     },
 
     cartDrawer: {
@@ -227,7 +232,7 @@ export const languages = {
       cancel: "Cancel",
       pay: "Pay",
       successTitle: "Payment successful!",
-      successMessage: "Your purchase was completed successfully 🎉 Thank you for trusting us.",
+      successMessage: "Your purchase was completed successfull, thank you for trusting us.",
       loginRequiredTitle: "Login required",
       loginRequiredMessage: "You must log in to complete the purchase.",
       accept: "Accept",
@@ -238,6 +243,9 @@ export const languages = {
       browseCatalog: "Browse catalog",
       heroTitle: "New arrivals",
       added: "Added",
+      smartphones: "Smartphones",
+      groceries: "Groceries",
+      homeDecoration: "Home Decoration",
     },
 
     catalog: {

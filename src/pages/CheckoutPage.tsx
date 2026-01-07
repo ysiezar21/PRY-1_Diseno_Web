@@ -30,7 +30,7 @@ const money = (n: number) =>
   }).format(n || 0);
 
 export default function CheckoutPage({ lang }: Props) {
-  const t = languages[lang || "es"].checkout;
+  const t = languages[lang || "en"].checkout;
   const { items, subtotal, clear } = useCart();
   const { user } = useAuth(); 
   const navigate = useNavigate();
