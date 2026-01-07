@@ -13,11 +13,15 @@ import {
   DialogActions,
   InputBase,
 } from "@mui/material";
-// Usamos `Box` para el layout responsive para evitar conflictos de tipos con Grid
 import { useNavigate } from "react-router-dom";
 
 import { useCart } from "../cart/CartProvider";
 import { useAuth } from "../auth/AuthProvider"; 
+import { languages } from "../languages/languages";
+
+type Props = {
+  lang: "es" | "en";
+};
 
 const money = (n: number) =>
   new Intl.NumberFormat("en-US", {
@@ -25,18 +29,18 @@ const money = (n: number) =>
     currency: "USD",
   }).format(n || 0);
 
-export default function CheckoutPage() {
+export default function CheckoutPage({ lang }: Props) {
+  const t = languages[lang || "en"].checkout;
   const { items, subtotal, clear } = useCart();
   const { user } = useAuth(); 
   const navigate = useNavigate();
 
   const descuento = items.reduce((acc, { product, qty }) => {
     const porcentaje = product.discountPercentage ?? 0;
-    const descuentoProducto =
-      (product.price * porcentaje / 100) * qty;
-
+    const descuentoProducto = (product.price * porcentaje / 100) * qty;
     return acc + descuentoProducto;
   }, 0);
+
   const shipping = items.length > 0 ? 5 : 0;
   const total = subtotal + shipping - descuento;
 
@@ -49,16 +53,13 @@ export default function CheckoutPage() {
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openLoginRequired, setOpenLoginRequired] = React.useState(false);
 
-
   const handleCheckout = () => {
     if (!user) {
       setOpenLoginRequired(true);
       return;
     }
-
     setOpenPayment(true);
   };
-
 
   const isPaymentValid = () => {
     const monthNum = parseInt(month, 10);
@@ -77,7 +78,7 @@ export default function CheckoutPage() {
 
   const handleConfirmPayment = () => {
     if (!isPaymentValid()) {
-      alert("Por favor completa todos los campos correctamente");
+      alert(t.completeFields);
       return;
     }
 
@@ -86,22 +87,18 @@ export default function CheckoutPage() {
     setOpenSuccess(true);
   };
 
-
   const handleCancelPayment = () => {
     setOpenPayment(false);
   };
 
-  // ================== Estilo dinámico para los inputs ==================
-  // Uso 'divider' para el borde, así se adapta al tema claro/oscuro
   const inputSx = {
     flex: 1,
     px: 1,
     py: 0.5,
     border: 1,
-    borderColor: "divider", 
+    borderColor: "divider",
     borderRadius: 1,
     minWidth: 0,
-    // quite colores fijos/hardcodeados
     color: "text.primary",
     bgcolor: "background.paper"
   };
@@ -110,8 +107,7 @@ export default function CheckoutPage() {
     <Box
       sx={{
         p: { xs: 2, md: 4 },
-        // aqui quite los colores fijos
-        bgcolor: "background.default", 
+        bgcolor: "background.default",
         color: "text.primary",
         minHeight: "100vh",
       }}
@@ -119,25 +115,21 @@ export default function CheckoutPage() {
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4, justifyContent: "center" }}>
         {/* Productos */}
         <Box sx={{ width: { xs: "100%", md: "75%" } }}>
-          <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>Productos</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>{t.products}</Typography>
           <Stack spacing={2}>
             {items.map(({ product, qty }) => (
-              <Paper 
-                key={product.id} 
-                sx={{ p: 2, display: "flex", alignItems: "center", gap: 2 }}
-                // Paper para que se adapte a los temas
-              >
+              <Paper key={product.id} sx={{ p: 2, display: "flex", alignItems: "center", gap: 2 }}>
                 <Avatar variant="rounded" src={product.thumbnail} sx={{ width: 90, height: 90 }} />
                 <Box sx={{ flex: 1 }}>
                   <Typography sx={{ fontWeight: 800 }}>{product.title}</Typography>
                   <Typography variant="body2" sx={{ opacity: 0.7 }}>{product.category}</Typography>
                 </Box>
                 <Box sx={{ textAlign: "right", minWidth: 90 }}>
-                  <Typography variant="body2">Cantidad</Typography>
+                  <Typography variant="body2">{t.quantity}</Typography>
                   <Typography sx={{ fontWeight: 800 }}>{qty}</Typography>
                 </Box>
                 <Box sx={{ textAlign: "right", minWidth: 120 }}>
-                  <Typography variant="body2">Total</Typography>
+                  <Typography variant="body2">{t.total}</Typography>
                   <Typography sx={{ fontWeight: 900 }}>{money(product.price * qty)}</Typography>
                 </Box>
               </Paper>
@@ -148,29 +140,28 @@ export default function CheckoutPage() {
         {/* Resumen */}
         <Box sx={{ width: { xs: "100%", md: "25%" } }}>
           <Paper sx={{ p: 3, position: "sticky", top: 140 }}>
-            <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>Resumen</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>{t.summary}</Typography>
             <Stack spacing={1.5}>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography>Subtotal</Typography>
+                <Typography>{t.subtotal}</Typography>
                 <Typography>{money(subtotal)}</Typography>
               </Box>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography>Envío</Typography>
+                <Typography>{t.shipping}</Typography>
                 <Typography>{money(shipping)}</Typography>
               </Box>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography>Descuento</Typography>
+                <Typography>{t.discount}</Typography>
                 <Typography>-{money(descuento)}</Typography>
               </Box>
               <Divider />
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography sx={{ fontWeight: 900 }}>Total</Typography>
+                <Typography sx={{ fontWeight: 900 }}>{t.total}</Typography>
                 <Typography sx={{ fontWeight: 900 }}>{money(total)}</Typography>
               </Box>
             </Stack>
-            {/* Usamos color="primary" en lugar de estilos manuales azules */}
             <Button variant="contained" color="primary" fullWidth sx={{ mt: 3 }} onClick={handleCheckout}>
-              Finalizar compra
+              {t.checkout}
             </Button>
           </Paper>
         </Box>
@@ -178,19 +169,19 @@ export default function CheckoutPage() {
 
       {/* Modal de pago */}
       <Dialog open={openPayment} onClose={handleCancelPayment}>
-        <DialogTitle sx={{ fontWeight: 900 }}>Información de la tarjeta</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 900 }}>{t.cardInfo}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <InputBase
               value={cardNumber}
               onChange={(e) => setCardNumber(e.target.value)}
-              placeholder="Número de tarjeta"
+              placeholder={t.cardNumber}
               sx={inputSx}
             />
             <InputBase
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
-              placeholder="Nombre en la tarjeta"
+              placeholder={t.cardName}
               sx={inputSx}
             />
             <Box sx={{ display: "flex", gap: 2 }}>
@@ -219,65 +210,35 @@ export default function CheckoutPage() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          {/* Botones nativos para que tomen los colores del tema */}
-          <Button onClick={handleCancelPayment} color="inherit">Cancelar</Button>
-          <Button
-            variant="contained"
-            onClick={handleConfirmPayment}
-            disabled={!isPaymentValid()}
-          >
-            Pagar
+          <Button onClick={handleCancelPayment} color="inherit">{t.cancel}</Button>
+          <Button variant="contained" onClick={handleConfirmPayment} disabled={!isPaymentValid()}>
+            {t.pay}
           </Button>
         </DialogActions>
       </Dialog>
+
       {/* Modal de éxito */}
-      <Dialog
-        open={openSuccess}
-        onClose={() => {}}>
-        <DialogTitle sx={{ fontWeight: 900 }}>
-          ¡Pago realizado!
-        </DialogTitle>
-
+      <Dialog open={openSuccess} onClose={() => {}}>
+        <DialogTitle sx={{ fontWeight: 900 }}>{t.successTitle}</DialogTitle>
         <DialogContent>
-          <Typography sx={{ mt: 1 }}>
-            Tu compra se realizó con éxito 🎉  
-            Gracias por confiar en nosotros.
-          </Typography>
+          <Typography sx={{ mt: 1 }}>{t.successMessage}</Typography>
         </DialogContent>
-
         <DialogActions>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setOpenSuccess(false);
-              navigate("/");
-            }}
-          >
-            Aceptar
+          <Button variant="contained" onClick={() => { setOpenSuccess(false); navigate("/"); }}>
+            {t.accept}
           </Button>
         </DialogActions>
       </Dialog>
+
       {/* Modal de inicio de sesión requerido */}
       <Dialog open={openLoginRequired}>
-        <DialogTitle sx={{ fontWeight: 900 }}>
-          Inicio de sesión requerido
-        </DialogTitle>
-
+        <DialogTitle sx={{ fontWeight: 900 }}>{t.loginRequiredTitle}</DialogTitle>
         <DialogContent>
-          <Typography sx={{ mt: 1 }}>
-            Debes iniciar sesión para finalizar la compra.
-          </Typography>
+          <Typography sx={{ mt: 1 }}>{t.loginRequiredMessage}</Typography>
         </DialogContent>
-
         <DialogActions>
-          <Button
-            onClick={() => {
-              setOpenLoginRequired(false);
-              navigate("/login");
-            }}
-            variant="contained"
-          >
-            Aceptar
+          <Button onClick={() => { setOpenLoginRequired(false); navigate("/login"); }} variant="contained">
+            {t.accept}
           </Button>
         </DialogActions>
       </Dialog>

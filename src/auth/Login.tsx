@@ -23,9 +23,9 @@ export default function Login({ goToRegister, lang, setLang }: Props) {
   const handleLogin = async () => {
     try {
       await login(email, password);
-      navigate(from, { replace: true }); 
+      navigate(from, { replace: true });
     } catch {
-      alert("Error al iniciar sesión");
+      alert(t.auth.loginError);
     }
   };
 
@@ -37,32 +37,34 @@ export default function Login({ goToRegister, lang, setLang }: Props) {
           className="link"
           onClick={() => setLang(lang === "es" ? "en" : "es")}
         >
-          {lang === "es" ? "English 🇺🇸" : "Español 🇪🇸"}
+          {lang === "es"
+            ? t.auth.switchToEnglish
+            : t.auth.switchToSpanish}
         </button>
 
-        <h2>{t.loginTitle}</h2>
+        <h2>{t.auth.loginTitle}</h2>
 
         <input
-          placeholder={t.email}
+          placeholder={t.auth.email}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           type="password"
-          placeholder={t.password}
+          placeholder={t.auth.password}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button className="primary" onClick={handleLogin}>
-          {t.loginBtn}
+          {t.auth.loginBtn}
         </button>
 
         <hr />
 
         <button className="link" onClick={goToRegister}>
-          {t.goToRegister}
+          {t.auth.goToRegister}
         </button>
       </div>
     </div>

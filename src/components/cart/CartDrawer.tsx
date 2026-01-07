@@ -23,6 +23,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import type { Product } from "../../api/dummyjson";
 import type { CartItem } from "../../cart/cartTypes";
+import { languages } from "../../languages/languages";
 
 type Props = {
   open: boolean;
@@ -39,10 +40,7 @@ type Props = {
 };
 
 const money = (n: number) =>
-  new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: "USD",
-  }).format(n || 0);
+  new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n || 0);
 
 export default function CartDrawer({
   open,
@@ -58,44 +56,26 @@ export default function CartDrawer({
   const [detail, setDetail] = React.useState<Product | null>(null);
   const navigate = useNavigate();
 
-  // ✅ FUNCIÓN CORRECTA
+  const t = languages[lang].cartDrawer;
+
   const handleContinue = () => {
-    onClose();              // cerrar carrito
-    navigate("/checkout");  // ir a checkout
+    onClose();
+    navigate("/checkout");
   };
 
   return (
     <>
       <Drawer anchor="right" open={open} onClose={onClose}>
-        <Box
-          sx={{
-            width: { xs: 340, sm: 420 },
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* HEADER */}
-          <Box
-            sx={{
-              p: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
+        <Box sx={{ width: { xs: 340, sm: 420 }, height: "100%", display: "flex", flexDirection: "column" }}>
+          <Box sx={{ p: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 900 }}>
-                {lang === "en" ? "Cart" : "Carrito"}
+                {t.title}
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.75 }}>
                 {items.length === 0
-                  ? lang === "en"
-                    ? "No items yet"
-                    : "Aún no hay productos"
-                  : lang === "en"
-                  ? `${items.length} item(s)`
-                  : `${items.length} producto(s)`}
+                  ? t.empty
+                  : `${items.length} ${t.itemCount}`}
               </Typography>
             </Box>
 
@@ -106,23 +86,14 @@ export default function CartDrawer({
 
           <Divider />
 
-          {/* BODY */}
           <List sx={{ flex: 1, overflow: "auto" }}>
             {items.map(({ product, qty }) => (
               <ListItem key={product.id} disableGutters sx={{ px: 2, py: 1 }}>
                 <Box sx={{ display: "flex", gap: 1.5, width: "100%" }}>
-                  <Avatar
-                    variant="rounded"
-                    src={product.thumbnail}
-                    sx={{ width: 72, height: 72 }}
-                  />
+                  <Avatar variant="rounded" src={product.thumbnail} sx={{ width: 72, height: 72 }} />
 
                   <Box sx={{ flex: 1 }}>
-                    <Typography
-                      sx={{ fontWeight: 800, cursor: "pointer" }}
-                      noWrap
-                      onClick={() => setDetail(product)}
-                    >
+                    <Typography sx={{ fontWeight: 800, cursor: "pointer" }} noWrap onClick={() => setDetail(product)}>
                       {product.title}
                     </Typography>
 
@@ -134,35 +105,20 @@ export default function CartDrawer({
                       {money(product.price)}
                     </Typography>
 
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{ mt: 1, alignItems: "center" }}
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={() => onDec(product.id)}
-                      >
+                    <Stack direction="row" spacing={1} sx={{ mt: 1, alignItems: "center" }}>
+                      <IconButton size="small" onClick={() => onDec(product.id)}>
                         <RemoveIcon fontSize="small" />
                       </IconButton>
 
-                      <Typography sx={{ fontWeight: 800 }}>
-                        {qty}
-                      </Typography>
+                      <Typography sx={{ fontWeight: 800 }}>{qty}</Typography>
 
-                      <IconButton
-                        size="small"
-                        onClick={() => onInc(product.id)}
-                      >
+                      <IconButton size="small" onClick={() => onInc(product.id)}>
                         <AddIcon fontSize="small" />
                       </IconButton>
 
                       <Box sx={{ flex: 1 }} />
 
-                      <IconButton
-                        size="small"
-                        onClick={() => onRemove(product.id)}
-                      >
+                      <IconButton size="small" onClick={() => onRemove(product.id)}>
                         <DeleteOutlineIcon fontSize="small" />
                       </IconButton>
                     </Stack>
@@ -173,69 +129,36 @@ export default function CartDrawer({
 
             {items.length === 0 && (
               <Box sx={{ p: 3 }}>
-                <Typography sx={{ opacity: 0.75 }}>
-                  {lang === "en"
-                    ? "Add products and they will appear here."
-                    : "Agregá productos y aparecerán acá."}
-                </Typography>
+                <Typography sx={{ opacity: 0.75 }}>{t.addProducts}</Typography>
               </Box>
             )}
           </List>
 
           <Divider />
 
-          {/* FOOTER */}
           <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mb: 1,
-              }}
-            >
-              <Typography sx={{ fontWeight: 800 }}>
-                Subtotal
-              </Typography>
-              <Typography sx={{ fontWeight: 900 }}>
-                {money(subtotal)}
-              </Typography>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+              <Typography sx={{ fontWeight: 800 }}>{t.subtotal}</Typography>
+              <Typography sx={{ fontWeight: 900 }}>{money(subtotal)}</Typography>
             </Box>
 
             <Stack spacing={1}>
-              <Button
-                variant="outlined"
-                fullWidth
-                disabled={items.length === 0}
-                onClick={onClear}
-              >
-                {lang === "en" ? "Clear" : "Vaciar"}
+              <Button variant="outlined" fullWidth disabled={items.length === 0} onClick={onClear}>
+                {t.clear}
               </Button>
 
-              {/* ✅ BOTÓN ARREGLADO */}
-              <Button
-                variant="contained"
-                fullWidth
-                disabled={items.length === 0}
-                onClick={handleContinue}
-              >
-                {lang === "en" ? "Continue" : "Continuar"}
+              <Button variant="contained" fullWidth disabled={items.length === 0} onClick={handleContinue}>
+                {t.continue}
               </Button>
             </Stack>
           </Box>
         </Box>
       </Drawer>
 
-      {/* MODAL DETALLE */}
       <Dialog open={Boolean(detail)} onClose={() => setDetail(null)}>
-        <DialogTitle>
-          {lang === "en" ? "Product details" : "Detalles del producto"}
-        </DialogTitle>
+        <DialogTitle>{t.productDetails}</DialogTitle>
         <DialogContent>
-          {detail && (
-            <Typography sx={{ fontWeight: 900 }}>
-              {detail.title}
-            </Typography>
-          )}
+          {detail && <Typography sx={{ fontWeight: 900 }}>{detail.title}</Typography>}
         </DialogContent>
       </Dialog>
     </>
