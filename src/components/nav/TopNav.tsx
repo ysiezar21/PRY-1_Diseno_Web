@@ -19,8 +19,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import Brightness4Icon from '@mui/icons-material/Brightness4'; // Luna
-import Brightness7Icon from '@mui/icons-material/Brightness7'; // Sol
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { languages } from "../../languages/languages";
 
 // Definición de tipos para las propiedades (Props)
 type Props = {
@@ -53,26 +54,23 @@ export default function TopNav({
   onToggleTheme,
   currentMode,
 }: Props) {
-  // Estado local para almacenar el texto de búsqueda
   const [q, setQ] = React.useState("");
   const navigate = useNavigate();
 
-  // Manejador del envío del formulario de búsqueda
+  const t = languages[lang];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearchSubmit(q.trim());
   };
 
   return (
-    // Barra de navegación superior (sticky = se queda fija al hacer scroll)
     <AppBar position="sticky" elevation={0} sx={{ bgcolor: "primary.main" }}>
       <Toolbar sx={{ gap: 2 }}>
-        {/* Botón de menú hamburguesa para abrir el panel lateral */}
         <IconButton color="inherit" onClick={onOpenDrawer} edge="start">
           <MenuIcon />
         </IconButton>
 
-        {/* Nombre de tienda*/}
         <Typography
           variant="h6"
           onClick={() => navigate("/")}
@@ -85,11 +83,9 @@ export default function TopNav({
             },
           }}
         >
-          SuperMercado
+          {t.topNav.storeName}
         </Typography>
 
-
-        {/* Contenedor de la barra de búsqueda */}
         <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: "flex" }}>
           <Paper
             sx={{
@@ -97,18 +93,16 @@ export default function TopNav({
               display: "flex",
               alignItems: "center",
               px: 1,
-              borderRadius: 999, // Bordes totalmente redondeados
+              borderRadius: 999,
               overflow: "hidden",
             }}
           >
-            {/* Input de texto para buscar */}
             <InputBase
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder={lang === "en" ? "What are you looking for?" : "¿Qué estás buscando?"}
+              placeholder={t.topNav.searchPlaceholder}
               sx={{ flex: 1, px: 1 }}
             />
-            {/* Botón lupa para enviar búsqueda */}
             <IconButton
               type="submit"
               sx={{
@@ -123,11 +117,10 @@ export default function TopNav({
           </Paper>
         </Box>
 
-        <IconButton sx={{ ml: 1}} onClick={onToggleTheme} color="inherit">
+        <IconButton sx={{ ml: 1 }} onClick={onToggleTheme} color="inherit">
           {currentMode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
         </IconButton>
 
-        {/* Selector de idioma (Español / Inglés) TODO */}
         <ToggleButtonGroup
           exclusive
           value={lang}
@@ -143,23 +136,20 @@ export default function TopNav({
           </ToggleButton>
         </ToggleButtonGroup>
 
-        {/* Grupo de iconos de usuario (Listas, Cuenta, Pedidos, Carrito) */}
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-
-          <Tooltip title={lang === "en" ? "My account" : "Mi cuenta"}>
+          <Tooltip title={t.topNav.myAccount}>
             <IconButton color="inherit">
               <AccountCircleIcon />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={lang === "en" ? "Orders" : "Pedidos"}>
+          <Tooltip title={t.topNav.orders}>
             <IconButton color="inherit">
               <ReceiptLongIcon />
             </IconButton>
           </Tooltip>
 
-          {/* Carrito de compras con contador (Badge) */}
-          <Tooltip title={lang === "en" ? "Cart" : "Carrito"}>
+          <Tooltip title={t.topNav.cart}>
             <IconButton color="inherit" onClick={onOpenCart}>
               <Badge badgeContent={cartCount} color="warning">
                 <ShoppingCartOutlinedIcon />
@@ -167,14 +157,13 @@ export default function TopNav({
             </IconButton>
           </Tooltip>
 
-          {/* Botón condicional: Login si no está logueado, Logout si lo está */}
           {!isLogged ? (
             <Button
               onClick={onLoginClick}
               variant="contained"
               sx={{ ml: 1, bgcolor: "#ffc220", color: "#000", fontWeight: 800 }}
             >
-              {lang === "en" ? "Sign in" : "Iniciar sesión"}
+              {t.topNav.signIn}
             </Button>
           ) : (
             <Button
@@ -182,7 +171,7 @@ export default function TopNav({
               variant="outlined"
               sx={{ ml: 1, borderColor: "rgba(255,255,255,0.7)", color: "#fff" }}
             >
-              {lang === "en" ? "Logout" : "Salir"}
+              {t.topNav.logout}
             </Button>
           )}
         </Box>

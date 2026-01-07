@@ -7,16 +7,20 @@ import {
   ListItemText,
   Divider,
 } from "@mui/material";
+import { languages } from "../../languages/languages";
 
-// Props recibidas para controlar la visibilidad y la selección
 type Props = {
   open: boolean;
   onClose: () => void;
   categories: string[];
   onPickCategory: (category: string | null) => void;
+  lang: "es" | "en";
 };
 
-export default function CategoryDrawer({ open, onClose, categories, onPickCategory }: Props) {
+export default function CategoryDrawer({ open, onClose, categories, onPickCategory, lang }: Props) {
+  // Protección contra lang undefined o inesperado
+  const t = languages[lang || "es"];
+
   // Función auxiliar para formatear texto (ej: "smart-phones" -> "Smart Phones")
   const pretty = (s: string) =>
     s
@@ -25,26 +29,20 @@ export default function CategoryDrawer({ open, onClose, categories, onPickCatego
       .join(" ");
 
   return (
-    // Componente lateral (Drawer) que se despliega desde la izquierda
     <Drawer anchor="left" open={open} onClose={onClose}>
-      
-      {/* Contenedor con ancho fijo para el menú */}
       <Box sx={{ width: 320 }}>
-        
-        {/* Encabezado del menú lateral */}
         <Box sx={{ p: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: 900 }}>
-            Categorías
+            {t.categoryDrawer.title}
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.75 }}>
-            Seleccioná para cargar una categoria específica
+            {t.categoryDrawer.subtitle}
           </Typography>
         </Box>
 
         <Divider />
 
         <List>
-          {/* Generación dinámica de botones según lo que se recibe (las categorias)*/}
           {categories.map((c) => (
             <ListItemButton
               key={c}
@@ -53,7 +51,6 @@ export default function CategoryDrawer({ open, onClose, categories, onPickCatego
                 onClose();
               }}
             >
-              {/* uso de 'pretty' para que el texto se vea bien, lo aprendí en una guia */}
               <ListItemText primary={pretty(c)} />
             </ListItemButton>
           ))}
