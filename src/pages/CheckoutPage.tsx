@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   Box,
-  Grid,
   Typography,
   Paper,
   Button,
@@ -14,6 +13,7 @@ import {
   DialogActions,
   InputBase,
 } from "@mui/material";
+// Usamos `Box` para el layout responsive para evitar conflictos de tipos con Grid
 import { useNavigate } from "react-router-dom";
 
 import { useCart } from "../cart/CartProvider";
@@ -30,8 +30,15 @@ export default function CheckoutPage() {
   const { user } = useAuth(); 
   const navigate = useNavigate();
 
+  const descuento = items.reduce((acc, { product, qty }) => {
+    const porcentaje = product.discountPercentage ?? 0;
+    const descuentoProducto =
+      (product.price * porcentaje / 100) * qty;
+
+    return acc + descuentoProducto;
+  }, 0);
   const shipping = items.length > 0 ? 5 : 0;
-  const total = subtotal + shipping;
+  const total = subtotal + shipping - descuento;
 
   const [openPayment, setOpenPayment] = React.useState(false);
   const [cardNumber, setCardNumber] = React.useState("");
@@ -39,15 +46,19 @@ export default function CheckoutPage() {
   const [month, setMonth] = React.useState("");
   const [year, setYear] = React.useState("");
   const [cvv, setCvv] = React.useState("");
+  const [openSuccess, setOpenSuccess] = React.useState(false);
+  const [openLoginRequired, setOpenLoginRequired] = React.useState(false);
+
 
   const handleCheckout = () => {
     if (!user) {
-      alert("Debes iniciar sesión para finalizar la compra");
-      navigate("/login");
+      setOpenLoginRequired(true);
       return;
     }
+
     setOpenPayment(true);
   };
+
 
   const isPaymentValid = () => {
     const monthNum = parseInt(month, 10);
@@ -69,55 +80,53 @@ export default function CheckoutPage() {
       alert("Por favor completa todos los campos correctamente");
       return;
     }
-    alert("Pago realizado con éxito 🎉");
+
     clear();
     setOpenPayment(false);
-    navigate("/");
+    setOpenSuccess(true);
   };
+
 
   const handleCancelPayment = () => {
     setOpenPayment(false);
   };
 
-  if (items.length === 0) {
-    return (
-      <Box sx={{ p: 4 }}>
-        <Typography variant="h6">No hay productos seleccionados</Typography>
-      </Box>
-    );
-  }
-
-  // ================== Estilo para los inputs ==================
-  const inputStyle = {
+  // ================== Estilo dinámico para los inputs ==================
+  // Uso 'divider' para el borde, así se adapta al tema claro/oscuro
+  const inputSx = {
     flex: 1,
     px: 1,
     py: 0.5,
-    border: "1px solid #ccc",
+    border: 1,
+    borderColor: "divider", 
     borderRadius: 1,
     minWidth: 0,
-  };
-
-  const buttonBlueStyle = {
-    color: "white",
-    backgroundColor: "blue",
-    "&:hover": { backgroundColor: "#0051b3" },
+    // quite colores fijos/hardcodeados
+    color: "text.primary",
+    bgcolor: "background.paper"
   };
 
   return (
     <Box
       sx={{
         p: { xs: 2, md: 4 },
-        backgroundColor: "#f5f5f5",
+        // aqui quite los colores fijos
+        bgcolor: "background.default", 
+        color: "text.primary",
         minHeight: "100vh",
       }}
     >
-      <Grid container spacing={4}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4, justifyContent: "center" }}>
         {/* Productos */}
-        <Grid item xs={12} md={9}>
+        <Box sx={{ width: { xs: "100%", md: "75%" } }}>
           <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>Productos</Typography>
           <Stack spacing={2}>
             {items.map(({ product, qty }) => (
-              <Paper key={product.id} sx={{ p: 2, display: "flex", alignItems: "center", gap: 2 }}>
+              <Paper 
+                key={product.id} 
+                sx={{ p: 2, display: "flex", alignItems: "center", gap: 2 }}
+                // Paper para que se adapte a los temas
+              >
                 <Avatar variant="rounded" src={product.thumbnail} sx={{ width: 90, height: 90 }} />
                 <Box sx={{ flex: 1 }}>
                   <Typography sx={{ fontWeight: 800 }}>{product.title}</Typography>
@@ -134,10 +143,10 @@ export default function CheckoutPage() {
               </Paper>
             ))}
           </Stack>
-        </Grid>
+        </Box>
 
         {/* Resumen */}
-        <Grid item xs={12} md={3}>
+        <Box sx={{ width: { xs: "100%", md: "25%" } }}>
           <Paper sx={{ p: 3, position: "sticky", top: 140 }}>
             <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>Resumen</Typography>
             <Stack spacing={1.5}>
@@ -149,18 +158,23 @@ export default function CheckoutPage() {
                 <Typography>Envío</Typography>
                 <Typography>{money(shipping)}</Typography>
               </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography>Descuento</Typography>
+                <Typography>-{money(descuento)}</Typography>
+              </Box>
               <Divider />
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography sx={{ fontWeight: 900 }}>Total</Typography>
                 <Typography sx={{ fontWeight: 900 }}>{money(total)}</Typography>
               </Box>
             </Stack>
-            <Button variant="contained" fullWidth sx={{ mt: 3 }} onClick={handleCheckout}>
+            {/* Usamos color="primary" en lugar de estilos manuales azules */}
+            <Button variant="contained" color="primary" fullWidth sx={{ mt: 3 }} onClick={handleCheckout}>
               Finalizar compra
             </Button>
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Modal de pago */}
       <Dialog open={openPayment} onClose={handleCancelPayment}>
@@ -171,27 +185,27 @@ export default function CheckoutPage() {
               value={cardNumber}
               onChange={(e) => setCardNumber(e.target.value)}
               placeholder="Número de tarjeta"
-              sx={inputStyle}
+              sx={inputSx}
             />
             <InputBase
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
               placeholder="Nombre en la tarjeta"
-              sx={inputStyle}
+              sx={inputSx}
             />
             <Box sx={{ display: "flex", gap: 2 }}>
               <InputBase
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
                 placeholder="MM"
-                sx={{ ...inputStyle, flex: 1 }}
+                sx={{ ...inputSx, flex: 1 }}
                 inputProps={{ maxLength: 2 }}
               />
               <InputBase
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 placeholder="AA"
-                sx={{ ...inputStyle, flex: 1 }}
+                sx={{ ...inputSx, flex: 1 }}
                 inputProps={{ maxLength: 2 }}
               />
             </Box>
@@ -199,20 +213,71 @@ export default function CheckoutPage() {
               value={cvv}
               onChange={(e) => setCvv(e.target.value)}
               placeholder="CVV"
-              sx={inputStyle}
+              sx={inputSx}
               inputProps={{ maxLength: 4 }}
             />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelPayment} sx={buttonBlueStyle}>Cancelar</Button>
+          {/* Botones nativos para que tomen los colores del tema */}
+          <Button onClick={handleCancelPayment} color="inherit">Cancelar</Button>
           <Button
             variant="contained"
             onClick={handleConfirmPayment}
-            sx={buttonBlueStyle}
             disabled={!isPaymentValid()}
           >
             Pagar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Modal de éxito */}
+      <Dialog
+        open={openSuccess}
+        onClose={() => {}}>
+        <DialogTitle sx={{ fontWeight: 900 }}>
+          ¡Pago realizado!
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography sx={{ mt: 1 }}>
+            Tu compra se realizó con éxito 🎉  
+            Gracias por confiar en nosotros.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setOpenSuccess(false);
+              navigate("/");
+            }}
+          >
+            Aceptar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Modal de inicio de sesión requerido */}
+      <Dialog open={openLoginRequired}>
+        <DialogTitle sx={{ fontWeight: 900 }}>
+          Inicio de sesión requerido
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography sx={{ mt: 1 }}>
+            Debes iniciar sesión para finalizar la compra.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setOpenLoginRequired(false);
+              navigate("/login");
+            }}
+            variant="contained"
+          >
+            Aceptar
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Drawer,
   Box,
@@ -38,25 +37,13 @@ export default function CategoryDrawer({ open, onClose, categories, onPickCatego
             Categorías
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.75 }}>
-            Seleccioná una para cargar su carrusel
+            Seleccioná para cargar una categoria específica
           </Typography>
         </Box>
 
         <Divider />
 
         <List>
-          {/* Opción predeterminada para limpiar filtros (null) y ver todo */}
-          <ListItemButton
-            onClick={() => {
-              onPickCategory(null);
-              onClose(); // se cierra el drawer al seleccionar
-            }}
-          >
-            <ListItemText primary="Ver todo" />
-          </ListItemButton>
-
-          <Divider sx={{ my: 1 }} />
-
           {/* Generación dinámica de botones según lo que se recibe (las categorias)*/}
           {categories.map((c) => (
             <ListItemButton
