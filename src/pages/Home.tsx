@@ -8,6 +8,7 @@ import { getProducts, getProductsByCategory } from "../api/dummyjson";
 import HeroCarousel from "../components/carousels/HeroCarousel";
 import ProductRowCarousel from "../components/carousels/ProductRowCarousel";
 import { useCart } from "../cart/CartProvider";
+import { languages } from "../languages/languages";
 
 type Props = {
   lang: "es" | "en";
@@ -22,6 +23,8 @@ const pretty = (s: string) =>
     .join(" ");
 
 export default function Home({ lang }: Props) {
+  const t = languages[lang].home;
+
   const nav = useNavigate();
   const { add } = useCart();
 
@@ -29,7 +32,7 @@ export default function Home({ lang }: Props) {
   const [rowsData, setRowsData] = React.useState<Record<string, Product[]>>({});
   const [toast, setToast] = React.useState({ open: false, msg: "" });
 
-  // Aca se pueden agregar facilmente mas filas
+  // Configuración de filas
   const rowsConfig: RowConfig[] = React.useMemo(
     () => [
       { title: "Smartphones", category: "smartphones", limit: 12 },
@@ -75,7 +78,7 @@ export default function Home({ lang }: Props) {
 
   const addToCart = (p: Product) => {
     add(p);
-    setToast({ open: true, msg: `${lang === "en" ? "Added" : "Agregado"}: ${p.title}` });
+    setToast({ open: true, msg: `${t.added}: ${p.title}` });
   };
 
   return (
@@ -83,11 +86,11 @@ export default function Home({ lang }: Props) {
       <Container sx={{ pb: 6 }}>
         <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
           <Button variant="outlined" onClick={() => nav("/products")}>
-            {lang === "en" ? "Browse catalog" : "Ver catálogo"}
+            {t.browseCatalog}
           </Button>
         </Box>
 
-        <HeroCarousel title={lang === "en" ? "New arrivals" : "Lo más nuevo"} items={heroItems} />
+        <HeroCarousel title={t.heroTitle} items={heroItems} />
 
         {rowsConfig.map((row) => (
           <ProductRowCarousel

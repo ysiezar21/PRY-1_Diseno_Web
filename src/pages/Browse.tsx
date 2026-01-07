@@ -32,6 +32,7 @@ import type { Product } from "../api/dummyjson";
 import { getAllProducts, getAllProductsByCategory, searchAllProducts } from "../api/dummyjson";
 import ProductGridCard from "../components/products/ProductGridCard";
 import { useCart } from "../cart/CartProvider";
+import { languages } from "../languages/languages";
 
 type Mode = "all" | "search" | "category";
 
@@ -77,7 +78,9 @@ export default function Browse({ mode, lang }: Props) {
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = React.useState(false);
 
-  // Cargar resultados segun modo
+  const t = languages[lang].browse;
+
+  // Cargar resultados según modo
   React.useEffect(() => {
     const run = async () => {
       setLoading(true);
@@ -95,7 +98,6 @@ export default function Browse({ mode, lang }: Props) {
         } else {
           // search
           if (!q) {
-            // si no hay query, mandamos al catálogo completo
             nav("/products", { replace: true });
             return;
           }
@@ -133,7 +135,6 @@ export default function Browse({ mode, lang }: Props) {
       setError(String(e));
       setLoading(false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, category, q]);
 
   const filtered = React.useMemo(() => {
@@ -177,7 +178,6 @@ export default function Browse({ mode, lang }: Props) {
         out.sort((a, b) => (Number(b.discountPercentage) || 0) - (Number(a.discountPercentage) || 0));
         break;
       default:
-        // relevance: no tocamos el orden (DummyJSON ya lo trae "relevante" para search)
         break;
     }
 
@@ -197,9 +197,9 @@ export default function Browse({ mode, lang }: Props) {
 
   const title = React.useMemo(() => {
     if (mode === "category") return pretty(category ?? "");
-    if (mode === "search") return q ? (lang === "en" ? `Results: "${q}"` : `Resultados: "${q}"`) : "";
-    return lang === "en" ? "Catalog" : "Catálogo";
-  }, [mode, category, q, lang]);
+    if (mode === "search") return q ? `${lang === "en" ? "Results" : "Resultados"}: "${q}"` : "";
+    return lang === "en" ? t.catalog : t.catalog;
+  }, [mode, category, q, lang, t]);
 
   const clearFilters = () => {
     const prices = base.map((p) => Number(p.price) || 0);
@@ -215,32 +215,32 @@ export default function Browse({ mode, lang }: Props) {
 
   const FiltersPanel = (
     <Box sx={{ width: { xs: 320, md: 280 }, p: 2 }}>
-      <Typography sx={{ fontWeight: 900, mb: 1 }}>{lang === "en" ? "Filters" : "Filtros"}</Typography>
+      <Typography sx={{ fontWeight: 900, mb: 1 }}>{t.filters}</Typography>
       <Divider sx={{ mb: 2 }} />
 
       <Stack spacing={2}>
         <FormControl fullWidth size="small">
-          <InputLabel>{lang === "en" ? "Sort" : "Ordenar"}</InputLabel>
+          <InputLabel>{t.sort}</InputLabel>
           <Select
-            label={lang === "en" ? "Sort" : "Ordenar"}
+            label={t.sort}
             value={sort}
             onChange={(e) => {
               setSort(e.target.value as any);
               setPage(1);
             }}
           >
-            <MenuItem value="relevance">{lang === "en" ? "Relevance" : "Relevancia"}</MenuItem>
-            <MenuItem value="name_asc">{lang === "en" ? "Name (A-Z)" : "Nombre (A-Z)"}</MenuItem>
-            <MenuItem value="price_asc">{lang === "en" ? "Price (low-high)" : "Precio (menor-mayor)"}</MenuItem>
-            <MenuItem value="price_desc">{lang === "en" ? "Price (high-low)" : "Precio (mayor-menor)"}</MenuItem>
-            <MenuItem value="rating_desc">{lang === "en" ? "Rating (high-low)" : "Calificación (mayor-menor)"}</MenuItem>
-            <MenuItem value="discount_desc">{lang === "en" ? "Discount (high-low)" : "Descuento (mayor-menor)"}</MenuItem>
+            <MenuItem value="relevance">{t.relevance}</MenuItem>
+            <MenuItem value="name_asc">{t.nameAsc}</MenuItem>
+            <MenuItem value="price_asc">{t.priceAsc}</MenuItem>
+            <MenuItem value="price_desc">{t.priceDesc}</MenuItem>
+            <MenuItem value="rating_desc">{t.ratingDesc}</MenuItem>
+            <MenuItem value="discount_desc">{t.discountDesc}</MenuItem>
           </Select>
         </FormControl>
 
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 800, mb: 1 }}>
-            {lang === "en" ? "Price range" : "Rango de precio"}
+            {t.priceRange}
           </Typography>
           <Slider
             value={priceRange}
@@ -257,7 +257,7 @@ export default function Browse({ mode, lang }: Props) {
 
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 800, mb: 1 }}>
-            {lang === "en" ? "Minimum rating" : "Calificación mínima"}: {minRating}
+            {t.minRating}: {minRating}
           </Typography>
           <Slider
             value={minRating}
@@ -282,7 +282,7 @@ export default function Browse({ mode, lang }: Props) {
               }}
             />
           }
-          label={lang === "en" ? "Only in-stock" : "Solo disponibles"}
+          label={t.onlyInStock}
         />
 
         <Autocomplete
@@ -300,17 +300,13 @@ export default function Browse({ mode, lang }: Props) {
             ))
           }
           renderInput={(params) => (
-            <TextField
-              {...params}
-              label={lang === "en" ? "Brands" : "Marcas"}
-              placeholder={lang === "en" ? "Select" : "Seleccionar"}
-            />
+            <TextField {...params} label={t.brands} placeholder={t.select} />
           )}
         />
 
         <Stack direction="row" spacing={1}>
           <Button variant="outlined" fullWidth onClick={clearFilters}>
-            {lang === "en" ? "Clear" : "Limpiar"}
+            {t.clear}
           </Button>
           <Button
             variant="contained"
@@ -322,7 +318,7 @@ export default function Browse({ mode, lang }: Props) {
               setMobileFiltersOpen(false);
             }}
           >
-            {lang === "en" ? "Apply" : "Aplicar"}
+            {t.apply}
           </Button>
         </Stack>
       </Stack>
@@ -338,33 +334,26 @@ export default function Browse({ mode, lang }: Props) {
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.75 }}>
             {loading
-              ? lang === "en"
-                ? "Loading..."
-                : "Cargando..."
-              : lang === "en"
-                ? `${filtered.length} result(s)`
-                : `${filtered.length} resultado(s)`}
+              ? t.loading
+              : `${filtered.length} ${t.results}`}
           </Typography>
         </Box>
 
-        {/* botón filtros (mobile) */}
         <Button
           startIcon={<FilterAltIcon />}
           variant="outlined"
           sx={{ display: { xs: "inline-flex", md: "none" } }}
           onClick={() => setMobileFiltersOpen(true)}
         >
-          {lang === "en" ? "Filters" : "Filtros"}
+          {t.filters}
         </Button>
       </Box>
 
       <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ mt: 2 }}>
-        {/* Sidebar filtros (desktop) */}
         <Paper sx={{ display: { xs: "none", md: "block" }, flex: "0 0 auto" }}>
           {FiltersPanel}
         </Paper>
 
-        {/* Resultados */}
         <Box sx={{ flex: 1 }}>
           <Paper sx={{ p: 2 }}>
             {error && (
@@ -381,7 +370,8 @@ export default function Browse({ mode, lang }: Props) {
               <>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
                   {view.map((p) => (
-                    <Box key={p.id}
+                    <Box
+                      key={p.id}
                       sx={{
                         width: { xs: "100%", sm: "calc(50% - 16px)", md: "calc(33.333% - 16px)", lg: "calc(25% - 16px)" },
                       }}
@@ -393,7 +383,7 @@ export default function Browse({ mode, lang }: Props) {
                           add(prod);
                           setToast({
                             open: true,
-                            msg: `${lang === "en" ? "Added" : "Agregado"}: ${prod.title}`,
+                            msg: `${t.added}: ${prod.title}`,
                           });
                         }}
                       />
@@ -401,19 +391,16 @@ export default function Browse({ mode, lang }: Props) {
                   ))}
                 </Box>
 
-
                 {filtered.length === 0 && (
                   <Box sx={{ py: 6, textAlign: "center" }}>
                     <Typography sx={{ fontWeight: 900 }}>
-                      {lang === "en" ? "No results" : "Sin resultados"}
+                      {t.noResults}
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.75, mt: 1 }}>
-                      {lang === "en"
-                        ? "Try removing some filters."
-                        : "Probá quitando algunos filtros."}
+                      {t.tryRemovingFilters}
                     </Typography>
                     <Button sx={{ mt: 2 }} variant="outlined" onClick={clearFilters}>
-                      {lang === "en" ? "Clear filters" : "Limpiar filtros"}
+                      {t.clearFilters}
                     </Button>
                   </Box>
                 )}
@@ -434,7 +421,6 @@ export default function Browse({ mode, lang }: Props) {
         </Box>
       </Stack>
 
-      {/* Drawer de filtros (mobile) */}
       <Drawer
         anchor="right"
         open={mobileFiltersOpen}
@@ -442,7 +428,7 @@ export default function Browse({ mode, lang }: Props) {
         sx={{ display: { xs: "block", md: "none" } }}
       >
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1.5 }}>
-          <Typography sx={{ fontWeight: 900 }}>{lang === "en" ? "Filters" : "Filtros"}</Typography>
+          <Typography sx={{ fontWeight: 900 }}>{t.filters}</Typography>
           <IconButton onClick={() => setMobileFiltersOpen(false)}>
             <CloseIcon />
           </IconButton>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { languages } from "../languages/languages";
 
 interface Product {
   id: number;
@@ -7,7 +8,13 @@ interface Product {
   thumbnail: string;
 }
 
-export default function Catalog() {
+type Props = {
+  lang: "es" | "en";
+};
+
+export default function Catalog({ lang }: Props) {
+  const t = languages[lang].catalog;
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,12 +32,12 @@ export default function Catalog() {
   }, []);
 
   if (loading) {
-    return <p>Cargando productos...</p>;
+    return <p>{t.loading}</p>;
   }
 
   return (
     <div className="catalog">
-      <h2>Catálogo</h2>
+      <h2>{t.catalogTitle}</h2>
 
       <div className="products-grid">
         {products.map((product) => (
