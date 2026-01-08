@@ -20,12 +20,14 @@ export default function Login({ goToRegister, lang, setLang }: Props) {
 
   const t = languages[lang];
 
+  const [showError, setShowError] = useState(false);
+
   const handleLogin = async () => {
     try {
       await login(email, password);
       navigate(from, { replace: true });
     } catch {
-      alert(t.auth.loginError);
+      setShowError(true);
     }
   };
 
@@ -66,6 +68,43 @@ export default function Login({ goToRegister, lang, setLang }: Props) {
         <button className="link" onClick={goToRegister}>
           {t.auth.goToRegister}
         </button>
+
+        {showError && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "#fff",
+                padding: "24px",
+                borderRadius: "8px",
+                textAlign: "center",
+                width: "300px",
+              }}
+            >
+              <h3>Error</h3>
+              <p>{t.auth.loginError}</p>
+              <button
+                className="primary"
+                onClick={() => setShowError(false)}
+              >
+                {t.checkout.accept}
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
