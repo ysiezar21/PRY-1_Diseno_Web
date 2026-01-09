@@ -64,6 +64,14 @@ export default function TopNav({
     onSearchSubmit(q.trim());
   };
 
+  const manejarClickCuenta = () => {
+    if (isLogged) {
+      navigate("/profile");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <AppBar position="sticky" elevation={0} sx={{ bgcolor: "primary.main" }}>
       <Toolbar sx={{ gap: 2 }}>
@@ -138,7 +146,7 @@ export default function TopNav({
 
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
           <Tooltip title={t.topNav.myAccount}>
-            <IconButton color="inherit">
+            <IconButton color="inherit" onClick={manejarClickCuenta}>
               <AccountCircleIcon />
             </IconButton>
           </Tooltip>
