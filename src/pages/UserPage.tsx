@@ -130,14 +130,14 @@ export default function ProfilePage({ lang }: Props) {
                   </ListItem>
                   
                   <ListItem disablePadding divider>
-                    <ListItemButton onClick={() => alert("Ir a Direcciones (Simulado)")}>
+                    <ListItemButton onClick={() => null}>
                         <ListItemIcon><HomeIcon color="action" /></ListItemIcon>
                         <ListItemText primary={t.addresses} secondary="San José, Costa Rica" />
                     </ListItemButton>
                   </ListItem>
 
                   <ListItem disablePadding>
-                    <ListItemButton onClick={() => alert("Ir a Pagos (Simulado)")}>
+                    <ListItemButton onClick={() => null}>
                         <ListItemIcon><CreditCardIcon color="action" /></ListItemIcon>
                         <ListItemText primary={t.paymentMethods} secondary="Visa ending in 4242" />
                     </ListItemButton>

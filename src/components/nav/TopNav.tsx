@@ -17,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
@@ -148,12 +147,6 @@ export default function TopNav({
           <Tooltip title={t.topNav.myAccount}>
             <IconButton color="inherit" onClick={manejarClickCuenta}>
               <AccountCircleIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title={t.topNav.orders}>
-            <IconButton color="inherit">
-              <ReceiptLongIcon />
             </IconButton>
           </Tooltip>
 
