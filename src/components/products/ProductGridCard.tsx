@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 
 import type { Product } from "../../api/dummyjson";
+import { languages } from "../../languages/languages";
 
 type Props = {
   product: Product;
@@ -28,6 +29,7 @@ const money = (n: number) =>
 
 export default function ProductGridCard({ product, lang, onAddToCart }: Props) {
   const [open, setOpen] = React.useState(false);
+  const t = languages[lang || "es"];
 
   return (
     <>
@@ -54,22 +56,16 @@ export default function ProductGridCard({ product, lang, onAddToCart }: Props) {
 
           <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: "wrap" }}>
             {typeof product.rating === "number" && (
-              <Chip size="small" label={`${lang === "en" ? "Rating" : "Calif."}: ${product.rating}`} />
+              <Chip size="small" label={`${t.productCard.rating}: ${product.rating}`} />
             )}
             {typeof product.discountPercentage === "number" && (
-              <Chip size="small" label={`${product.discountPercentage}% OFF`} />
+              <Chip size="small" label={`${product.discountPercentage}% ${t.productCard.discount}`} />
             )}
             {typeof product.stock === "number" && (
               <Chip
                 size="small"
                 label={
-                  product.stock > 0
-                    ? lang === "en"
-                      ? "In stock"
-                      : "Disponible"
-                    : lang === "en"
-                      ? "Out of stock"
-                      : "Agotado"
+                  product.stock > 0 ? t.productCard.inStock : t.productCard.outOfStock
                 }
               />
             )}
@@ -83,14 +79,14 @@ export default function ProductGridCard({ product, lang, onAddToCart }: Props) {
             onClick={() => onAddToCart(product)}
             disabled={typeof product.stock === "number" ? product.stock <= 0 : false}
           >
-            + {lang === "en" ? "Add" : "Agregar"}
+            + {t.productCard.add}
           </Button>
         </CardActions>
       </Card>
 
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 900 }}>
-          {lang === "en" ? "Product details" : "Detalles del producto"}
+          {t.productCard.productDetails}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
@@ -110,19 +106,19 @@ export default function ProductGridCard({ product, lang, onAddToCart }: Props) {
 
               {typeof product.discountPercentage === "number" && (
                 <Typography variant="body2" sx={{ mt: 0.5 }}>
-                  {lang === "en" ? "Discount" : "Descuento"}: {product.discountPercentage}%
+                  {t.productCard.discount}: {product.discountPercentage}%
                 </Typography>
               )}
 
               {typeof product.rating === "number" && (
                 <Typography variant="body2">
-                  {lang === "en" ? "Rating" : "Calificación"}: {product.rating}
+                  {t.productCard.rating}: {product.rating}
                 </Typography>
               )}
 
               {typeof product.stock === "number" && (
                 <Typography variant="body2">
-                  {lang === "en" ? "Stock" : "Existencias"}: {product.stock}
+                  {t.productCard.stock}: {product.stock}
                 </Typography>
               )}
             </Box>
@@ -134,7 +130,7 @@ export default function ProductGridCard({ product, lang, onAddToCart }: Props) {
 
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2, gap: 1 }}>
             <Button variant="outlined" onClick={() => setOpen(false)}>
-              {lang === "en" ? "Close" : "Cerrar"}
+              {t.productCard.close}
             </Button>
             <Button
               variant="contained"
@@ -144,7 +140,7 @@ export default function ProductGridCard({ product, lang, onAddToCart }: Props) {
               }}
               disabled={typeof product.stock === "number" ? product.stock <= 0 : false}
             >
-              + {lang === "en" ? "Add to cart" : "Agregar al carrito"}
+              + {t.productCard.addToCart}
             </Button>
           </Box>
         </DialogContent>

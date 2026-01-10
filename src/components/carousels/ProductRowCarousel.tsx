@@ -31,7 +31,7 @@ export default function ProductRowCarousel({ title, products, onAddToCart, lang 
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
         <Typography variant="h6" sx={{ fontWeight: 900 }}>
           {title}
-        </Typography>
+        </Typography> 
 
         <Box>
           <IconButton onClick={() => scrollBy(-320)} aria-label="scroll left">

@@ -79,6 +79,7 @@ export default function MainLayout({ user, lang, setLang, onLogout, toggleTheme,
         onClose={() => setDrawerOpen(false)}
         categories={categories}
         onPickCategory={pickCategory}
+        lang = {lang}
       />
 
       <CartDrawer

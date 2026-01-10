@@ -11,7 +11,8 @@ import { logout } from "./auth/auth";
 import MainLayout from "./layout/MainLayout";
 import Home from "./pages/Home";
 import Browse from "./pages/Browse";
-import CheckoutPage from "./pages/CheckoutPage"; 
+import CheckoutPage from "./pages/CheckoutPage";
+import UserPage from "./pages/UserPage";
 
 type Lang = "es" | "en";
 
@@ -79,9 +80,8 @@ export default function App({ toggleTheme, mode }: AppProps) {
           <Route path="/products" element={<Browse mode="all" lang={lang} />} />
           <Route path="/search" element={<Browse mode="search" lang={lang} />} />
           <Route path="/category/:category" element={<Browse mode="category" lang={lang} />} />
-          
-          {/* Tu ruta de Checkout recuperada */}
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/profile" element={<UserPage lang={lang} />} />
+          <Route path="/checkout" element={<CheckoutPage lang={lang} />} />
         </Route>
 
         {/* Pantallas de Autenticación */}
