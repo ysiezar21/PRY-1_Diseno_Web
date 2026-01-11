@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../cart/CartProvider";
 import { useAuth } from "../auth/AuthProvider"; 
 import { languages } from "../languages/languages";
+import { addNewOrder, addPaymentMethod } from "../services/userService";
 
 type Props = {
   lang: "es" | "en";
@@ -76,16 +77,67 @@ export default function CheckoutPage({ lang }: Props) {
     );
   };
 
-  const handleConfirmPayment = () => {
-    if (!isPaymentValid()) {
-      alert(t.completeFields);
+  const handleConfirmPayment = async () => { // <-- Añade async
+  if (!isPaymentValid()) {
+    alert(t.completeFields);
+    return;
+  }
+
+  try {
+    if (!user) {
+      alert("Usuario no autenticado");
       return;
     }
 
+    // 1. Crear método de pago
+    const metodoId = `metodo_${Date.now()}`;
+    const metodoPago = {
+      añoExp: year,
+      cvv: cvv,
+      mesExp: month,
+      numeroTarjeta: cardNumber.replace(/\s/g, ''), // Quitar espacios
+      titular: cardName
+    };
+
+    await addPaymentMethod(user.uid, metodoId, metodoPago);
+
+    // 2. Convertir items del carrito a productos para Firestore
+    const productosMap: { [key: string]: any } = {};
+    
+    items.forEach(({ product, qty }, index) => {
+      const productoId = `producto_${index + 1}`;
+      productosMap[productoId] = {
+        cantidad: qty,
+        categoria: product.category,
+        nombre: product.title,
+        precio: product.price
+      };
+    });
+
+    // 3. Crear el pedido
+    const pedidoId = `pedido_${Date.now()}`;
+    const pedido = {
+      productos: productosMap,
+      total: total,
+      fecha: new Date(), // Se convertirá a timestamp en addNewOrder
+      estado: "pendiente"
+    };
+
+    // 4. Guardar pedido en Firestore
+    await addNewOrder(user.uid, pedidoId, pedido);
+
+    // 5. Limpiar carrito y mostrar éxito
     clear();
     setOpenPayment(false);
     setOpenSuccess(true);
-  };
+
+    console.log("✅ Pedido guardado en Firestore:", pedidoId);
+
+  } catch (error) {
+    console.error("❌ Error guardando pedido:", error);
+    alert("Error al procesar el pedido. Intenta nuevamente.");
+  }
+};
 
   const handleCancelPayment = () => {
     setOpenPayment(false);
