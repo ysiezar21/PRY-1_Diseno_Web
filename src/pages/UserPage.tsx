@@ -15,24 +15,24 @@ import {
   Chip,
   CircularProgress,
   Alert,
-  TextField
+  TextField,
+  Badge
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 // Iconos
-
 import PhoneIcon from "@mui/icons-material/Phone";
 import HomeIcon from "@mui/icons-material/Home";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-
 import LogoutIcon from "@mui/icons-material/Logout";
-
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EditIcon from "@mui/icons-material/Edit";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 import { useAuth } from "../auth/AuthProvider";
 import { logout } from "../auth/auth";
 import { getUserProfile, getUserOrdersArray, getUserPaymentMethodsArray, updateUserData } from "../services/userService";
+import OrdersPopup from "../components/OrdersPopup"; // <-- NUEVO IMPORT
 
 type Props = {
   lang: "es" | "en";
@@ -54,6 +54,9 @@ export default function UserPage({ lang }: Props) {
     telefono: "",
     direccion: ""
   });
+  
+  // Estado para el popup de pedidos
+  const [ordersPopupOpen, setOrdersPopupOpen] = React.useState(false); // <-- NUEVO ESTADO
 
   React.useEffect(() => {
     if (!user) {
@@ -305,10 +308,45 @@ export default function UserPage({ lang }: Props) {
                 </>
               )}
 
-              
-            
-
-             
+              {/* Estadísticas rápidas */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Badge 
+                    badgeContent={userData.ordersCount} 
+                    color="primary"
+                    sx={{ 
+                      '& .MuiBadge-badge': { 
+                        fontSize: '1rem', 
+                        height: '28px', 
+                        minWidth: '28px' 
+                      } 
+                    }}
+                  >
+                    <ShoppingBagIcon color="action" sx={{ fontSize: 32 }} />
+                  </Badge>
+                  <Typography variant="caption" color="text.secondary">
+                    {t.totalOrders}
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Badge 
+                    badgeContent={userData.paymentMethodsCount} 
+                    color="primary"
+                    sx={{ 
+                      '& .MuiBadge-badge': { 
+                        fontSize: '1rem', 
+                        height: '28px', 
+                        minWidth: '28px' 
+                      } 
+                    }}
+                  >
+                    <CreditCardIcon color="action" sx={{ fontSize: 32 }} />
+                  </Badge>
+                  <Typography variant="caption" color="text.secondary">
+                    {t.totalCards}
+                  </Typography>
+                </Box>
+              </Box>
 
               {/* Botones de acción en modo edición */}
               {editMode && (
@@ -426,22 +464,14 @@ export default function UserPage({ lang }: Props) {
                     </ListItemButton>
                   </ListItem>
                   
-                  {/* Pedidos */}
+                  {/* Pedidos - AHORA ABRE EL POPUP */}
                   <ListItem disablePadding divider>
-                    <ListItemButton onClick={() => {
-                      if (editMode) return;
-                      if (orders.length === 0) {
-                        alert(lang === "en" 
-                          ? "You don't have any orders yet" 
-                          : "No tienes pedidos aún"
-                        );
-                      } else {
-                        alert(lang === "en" 
-                          ? `You have ${orders.length} orders` 
-                          : `Tienes ${orders.length} pedidos`
-                        );
-                      }
-                    }}>
+                    <ListItemButton 
+                      onClick={() => {
+                        if (editMode) return;
+                        setOrdersPopupOpen(true); // <-- ABRE EL POPUP
+                      }}
+                    >
                       <ListItemIcon>
                         <ShoppingBagIcon color={orders.length > 0 ? "primary" : "action"} />
                       </ListItemIcon>
@@ -449,7 +479,7 @@ export default function UserPage({ lang }: Props) {
                         primary={t.myOrders} 
                         secondary={
                           orders.length > 0 
-                            ? `${orders.length} ${t.totalOrders}` 
+                            ? `${orders.length} ${t.totalOrders} - Click para ver detalles` 
                             : lang === "en" ? "No orders yet" : "Sin pedidos"
                         }
                         secondaryTypographyProps={{ 
@@ -459,7 +489,38 @@ export default function UserPage({ lang }: Props) {
                     </ListItemButton>
                   </ListItem>
 
-                  
+                  {/* Métodos de Pago */}
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={() => {
+                      if (editMode) return;
+                      if (paymentMethods.length === 0) {
+                        alert(lang === "en" 
+                          ? "You don't have payment methods saved" 
+                          : "No tienes métodos de pago guardados"
+                        );
+                      } else {
+                        alert(lang === "en" 
+                          ? `You have ${paymentMethods.length} payment methods` 
+                          : `Tienes ${paymentMethods.length} métodos de pago`
+                        );
+                      }
+                    }}>
+                      <ListItemIcon>
+                        <CreditCardIcon color={paymentMethods.length > 0 ? "primary" : "action"} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={t.paymentMethods} 
+                        secondary={
+                          paymentMethods.length > 0 
+                            ? `${paymentMethods.length} ${t.totalCards}` 
+                            : lang === "en" ? "No payment methods" : "Sin métodos de pago"
+                        }
+                        secondaryTypographyProps={{ 
+                          color: paymentMethods.length > 0 ? "text.primary" : "text.secondary"
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
                 </List>
               </Paper>
 
@@ -470,7 +531,6 @@ export default function UserPage({ lang }: Props) {
                 </Typography>
                 
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                  
                   <Button 
                     fullWidth 
                     variant="contained" 
@@ -488,6 +548,14 @@ export default function UserPage({ lang }: Props) {
           </Box>
         </Box>
       </Container>
+
+      {/* Popup de Pedidos - Añade esto al final */}
+      <OrdersPopup
+        open={ordersPopupOpen}
+        onClose={() => setOrdersPopupOpen(false)}
+        userId={user?.uid || ""}
+        lang={lang}
+      />
     </Box>
   );
 }
