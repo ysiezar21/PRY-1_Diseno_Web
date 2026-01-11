@@ -5,7 +5,6 @@ import {
   Paper,
   Typography,
   Avatar,
-  Divider,
   Button,
   List,
   ListItem,
@@ -16,20 +15,18 @@ import {
   Chip,
   CircularProgress,
   Alert,
-  TextField,
-  Badge
+  TextField
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 // Iconos
-import EmailIcon from "@mui/icons-material/Email";
+
 import PhoneIcon from "@mui/icons-material/Phone";
 import HomeIcon from "@mui/icons-material/Home";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
-import SettingsIcon from "@mui/icons-material/Settings";
+
 import LogoutIcon from "@mui/icons-material/Logout";
-import PersonIcon from "@mui/icons-material/Person";
+
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EditIcon from "@mui/icons-material/Edit";
 

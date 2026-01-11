@@ -1,9 +1,9 @@
 // src/auth/Register.tsx
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { register } from "./auth"; // Ajusta esta ruta según tu estructura
-import { createUserProfile } from "../services/userService"; // Ajusta esta ruta
-import { languages } from "../languages/languages";
+import { register } from "./auth";
+import { createUserProfile } from "../services/userService";
+
 
 interface Props {
   goToLogin: () => void;
@@ -19,9 +19,7 @@ export default function Register({ goToLogin, lang, setLang }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as any)?.from || "/";
-  const t = languages[lang];
 
-  const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
@@ -51,8 +49,8 @@ export default function Register({ goToLogin, lang, setLang }: Props) {
         email,
         {
           nombre: nombre,
-          telefono: "",
-          direccion: ""
+          telefono: "-",
+          direccion: "-"
         }
       );
       
@@ -72,7 +70,6 @@ export default function Register({ goToLogin, lang, setLang }: Props) {
       }
       
       alert(errorMessage);
-      setShowError(true);
     } finally {
       setLoading(false);
     }
@@ -123,6 +120,7 @@ export default function Register({ goToLogin, lang, setLang }: Props) {
         </button>
 
         <hr />
+
         <button className="link" onClick={goToLogin} disabled={loading}>
           {lang === "es" ? "¿Ya tienes cuenta? Inicia sesión" : "Already have an account? Login"}
         </button>
