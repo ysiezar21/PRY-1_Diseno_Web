@@ -1,7 +1,9 @@
+// src/auth/Register.tsx
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { register } from "./auth";
-import { languages } from "../languages/languages";
+import { createUserProfile } from "../services/userService";
+
 
 interface Props {
   goToLogin: () => void;
@@ -10,101 +12,118 @@ interface Props {
 }
 
 export default function Register({ goToLogin, lang, setLang }: Props) {
+  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
   const location = useLocation();
-
   const from = (location.state as any)?.from || "/";
 
-  const t = languages[lang];
-
-  const [showError, setShowError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    console.log("🔍 Iniciando registro...");
+    
+    if (!nombre.trim() || !email.trim() || !password.trim()) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
+
+    if (password.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
     try {
-      await register(email, password);
+      setLoading(true);
+      
+      console.log("Llamando a register()...");
+      const userCredential = await register(email, password);
+      const user = userCredential.user;
+      console.log("Authentication OK. UID:", user.uid);
+      
+      console.log("Creando perfil en Firestore...");
+      await createUserProfile(
+        user.uid,
+        email,
+        {
+          nombre: nombre,
+          telefono: "-",
+          direccion: "-"
+        }
+      );
+      
+      console.log("¡Registro completo! Redirigiendo...");
       navigate(from, { replace: true });
-    } catch (error) {
-      setShowError(true);
+      
+    } catch (error: any) {
+      console.error("❌ ERROR:", error);
+      
+      let errorMessage = "Error al registrar";
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "Este email ya está registrado";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "La contraseña debe tener al menos 6 caracteres";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "Email inválido";
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-
         <button
           className="link"
           onClick={() => setLang(lang === "es" ? "en" : "es")}
+          disabled={loading}
         >
-          {lang === "es"
-            ? t.auth.switchToEnglish
-            : t.auth.switchToSpanish}
+          {lang === "es" ? "Switch to English" : "Cambiar a Español"}
         </button>
 
-        <h2>{t.auth.registerTitle}</h2>
+        <h2>{lang === "es" ? "Registro" : "Register"}</h2>
 
         <input
-          placeholder={t.auth.email}
+          placeholder={lang === "es" ? "Nombre completo *" : "Full name *"}
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          disabled={loading}
+        />
+
+        <input
+          placeholder={lang === "es" ? "Email *" : "Email *"}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
+          type="email"
         />
 
         <input
           type="password"
-          placeholder={t.auth.password}
+          placeholder={lang === "es" ? "Contraseña * (mínimo 6 caracteres)" : "Password * (minimum 6 characters)"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
         />
 
-        <button className="primary" onClick={handleRegister}>
-          {t.auth.registerBtn}
+        <button 
+          className="primary" 
+          onClick={handleRegister}
+          disabled={loading}
+        >
+          {loading ? (lang === "es" ? "Creando cuenta..." : "Creating account...") : (lang === "es" ? "Registrarse" : "Register")}
         </button>
 
         <hr />
 
-        <button className="link" onClick={goToLogin}>
-          {t.auth.goToLogin}
+        <button className="link" onClick={goToLogin} disabled={loading}>
+          {lang === "es" ? "¿Ya tienes cuenta? Inicia sesión" : "Already have an account? Login"}
         </button>
-
-        {showError && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 9999,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "#fff",
-                padding: "24px",
-                borderRadius: "8px",
-                textAlign: "center",
-                width: "300px",
-              }}
-            >
-              <h3>Error</h3>
-              <p>{t.auth.registerError}</p>
-              <button
-                className="primary"
-                onClick={() => setShowError(false)}
-              >
-                {t.checkout.accept}
-              </button>
-            </div>
-          </div>
-        )}
-
       </div>
     </div>
   );
