@@ -113,7 +113,7 @@ export const languages = {
 
     home: {
       browseCatalog: "Ver catálogo",
-      heroTitle: "Lo más nuevo",
+      heroTitle: "Recomendados para ti",
       added: "Agregado",
       smartphones: "Celulares",
       groceries: "Alimentos",
@@ -241,7 +241,7 @@ export const languages = {
 
     home: {
       browseCatalog: "Browse catalog",
-      heroTitle: "New arrivals",
+      heroTitle: "Recommended for you",
       added: "Added",
       smartphones: "Smartphones",
       groceries: "Groceries",

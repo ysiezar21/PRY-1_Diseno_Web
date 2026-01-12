@@ -16,7 +16,6 @@ import {
   CircularProgress,
   Alert,
   TextField,
-  Badge
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -308,46 +307,6 @@ export default function UserPage({ lang }: Props) {
                 </>
               )}
 
-              {/* Estadísticas rápidas */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Badge 
-                    badgeContent={userData.ordersCount} 
-                    color="primary"
-                    sx={{ 
-                      '& .MuiBadge-badge': { 
-                        fontSize: '1rem', 
-                        height: '28px', 
-                        minWidth: '28px' 
-                      } 
-                    }}
-                  >
-                    <ShoppingBagIcon color="action" sx={{ fontSize: 32 }} />
-                  </Badge>
-                  <Typography variant="caption" color="text.secondary">
-                    {t.totalOrders}
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Badge 
-                    badgeContent={userData.paymentMethodsCount} 
-                    color="primary"
-                    sx={{ 
-                      '& .MuiBadge-badge': { 
-                        fontSize: '1rem', 
-                        height: '28px', 
-                        minWidth: '28px' 
-                      } 
-                    }}
-                  >
-                    <CreditCardIcon color="action" sx={{ fontSize: 32 }} />
-                  </Badge>
-                  <Typography variant="caption" color="text.secondary">
-                    {t.totalCards}
-                  </Typography>
-                </Box>
-              </Box>
-
               {/* Botones de acción en modo edición */}
               {editMode && (
                 <Box sx={{ mt: 2 }}>
@@ -389,18 +348,14 @@ export default function UserPage({ lang }: Props) {
                   {/* Teléfono */}
                   <ListItem disablePadding divider>
                     <ListItemButton onClick={() => {
-                      if (editMode) return;
-                      if (userData.phone === "-") {
-                        alert(lang === "en" 
-                          ? "Add your phone number in edit mode" 
-                          : "Agrega tu número de teléfono en modo edición"
-                        );
-                      } else {
-                        alert(`${t.phone}: ${userData.phone}`);
+                      if (editMode) {
+                        return;
+                      }else {
+                        null;
                       }
                     }}>
                       <ListItemIcon>
-                        <PhoneIcon color={userData.phone !== "-" ? "primary" : "action"} />
+                        <PhoneIcon color={userData.phone !== "" ? "primary" : "action"} />
                       </ListItemIcon>
                       
                       {editMode ? (
@@ -416,8 +371,8 @@ export default function UserPage({ lang }: Props) {
                           primary={t.phone} 
                           secondary={userData.phone} 
                           secondaryTypographyProps={{ 
-                            color: userData.phone !== "-" ? "text.primary" : "text.secondary",
-                            fontWeight: userData.phone !== "-" ? 500 : 400
+                            color: userData.phone !== "" ? "text.primary" : "text.secondary",
+                            fontWeight: userData.phone !== "" ? 500 : 400
                           }}
                         />
                       )}
@@ -427,18 +382,14 @@ export default function UserPage({ lang }: Props) {
                   {/* Dirección */}
                   <ListItem disablePadding divider>
                     <ListItemButton onClick={() => {
-                      if (editMode) return;
-                      if (userData.address === "-") {
-                        alert(lang === "en" 
-                          ? "Add your address in edit mode" 
-                          : "Agrega tu dirección en modo edición"
-                        );
+                      if (editMode) {
+                        return;
                       } else {
-                        alert(`${t.addresses}: ${userData.address}`);
+                        null;
                       }
                     }}>
                       <ListItemIcon>
-                        <HomeIcon color={userData.address !== "-" ? "primary" : "action"} />
+                        <HomeIcon color={userData.address !== "" ? "primary" : "action"} />
                       </ListItemIcon>
                       
                       {editMode ? (
@@ -456,8 +407,8 @@ export default function UserPage({ lang }: Props) {
                           primary={t.addresses} 
                           secondary={userData.address} 
                           secondaryTypographyProps={{ 
-                            color: userData.address !== "-" ? "text.primary" : "text.secondary",
-                            fontWeight: userData.address !== "-" ? 500 : 400
+                            color: userData.address !== "" ? "text.primary" : "text.secondary",
+                            fontWeight: userData.address !== "" ? 500 : 400
                           }}
                         />
                       )}
@@ -492,17 +443,10 @@ export default function UserPage({ lang }: Props) {
                   {/* Métodos de Pago */}
                   <ListItem disablePadding>
                     <ListItemButton onClick={() => {
-                      if (editMode) return;
-                      if (paymentMethods.length === 0) {
-                        alert(lang === "en" 
-                          ? "You don't have payment methods saved" 
-                          : "No tienes métodos de pago guardados"
-                        );
+                      if (editMode) { 
+                        return;
                       } else {
-                        alert(lang === "en" 
-                          ? `You have ${paymentMethods.length} payment methods` 
-                          : `Tienes ${paymentMethods.length} métodos de pago`
-                        );
+                        null;
                       }
                     }}>
                       <ListItemIcon>
@@ -525,11 +469,7 @@ export default function UserPage({ lang }: Props) {
               </Paper>
 
               {/* Control de cuenta */}
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>
-                  {lang === "en" ? "Account Control" : "Control de Cuenta"}
-                </Typography>
-                
+              <Paper sx={{ p: 3 }}>      
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Button 
                     fullWidth 

@@ -9,6 +9,8 @@ import HeroCarousel from "../components/carousels/HeroCarousel";
 import ProductRowCarousel from "../components/carousels/ProductRowCarousel";
 import { useCart } from "../cart/CartProvider";
 import { languages } from "../languages/languages";
+import { useAuth } from "../auth/AuthProvider";
+import { getUserOrdersArray } from "../services/userService";
 
 type Props = {
   lang: "es" | "en";
@@ -27,6 +29,7 @@ export default function Home({ lang }: Props) {
 
   const nav = useNavigate();
   const { add } = useCart();
+  const { user } = useAuth();
 
   const [heroItems, setHeroItems] = React.useState<Product[]>([]);
   const [rowsData, setRowsData] = React.useState<Record<string, Product[]>>({});
@@ -45,10 +48,34 @@ export default function Home({ lang }: Props) {
 
   // Cargar hero inicial
   React.useEffect(() => {
-    getProducts(8, 0)
-      .then((res) => setHeroItems(res.products))
-      .catch((e) => console.error(e));
-  }, []);
+    if (!user?.uid) {
+      getProducts(8, 0)
+        .then((res) => setHeroItems(res.products))
+        .catch((e) => console.error(e));
+    } else {
+      getUserOrdersArray(user?.uid)
+        .then((orders) => {
+          const lastOrder = orders[0];
+
+          const category = lastOrder?.productosArray?.[0]?.categoria;
+
+          if (!category) return;
+
+          return fetch(
+            `https://dummyjson.com/products/category/${category}?limit=8`
+          );
+        })
+        .then((res) => {
+          if (!res) return;
+          return res.json();
+        })
+        .then((data) => {
+          if (!data) return;
+          setHeroItems(data.products);
+        })
+        .catch((e) => console.error(e));
+    }
+  }, [user]);
 
   // Cargar productos para cada fila
   React.useEffect(() => {

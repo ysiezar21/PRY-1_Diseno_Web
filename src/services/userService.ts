@@ -305,7 +305,6 @@ export const getUserOrdersArray = async (userId: string) => {
     }));
     
   } catch (error) {
-    console.error("❌ Error obteniendo pedidos:", error);
     throw error;
   }
 };
