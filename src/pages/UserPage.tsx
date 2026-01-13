@@ -97,7 +97,6 @@ export default function UserPage({ lang }: Props) {
         const userOrders = await getUserOrdersArray(user.uid);
         setOrders(userOrders);
       } catch (orderError) {
-        console.log("No se pudieron cargar los pedidos:", orderError);
       }
       
       // 3. Cargar métodos de pago
@@ -105,7 +104,6 @@ export default function UserPage({ lang }: Props) {
         const methods = await getUserPaymentMethodsArray(user.uid);
         setPaymentMethods(methods);
       } catch (paymentError) {
-        console.log("No se pudieron cargar los métodos de pago:", paymentError);
       }
       
     } catch (error: any) {

@@ -65,11 +65,9 @@ export const createUserProfile = async (
     };
     
     await setDoc(userRef, userProfile);
-    console.log("✅ Perfil creado en Firestore para:", email);
     return userProfile;
     
   } catch (error) {
-    console.error("❌ Error creando perfil:", error);
     throw error;
   }
 };
@@ -86,7 +84,6 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     return null;
     
   } catch (error) {
-    console.error("❌ Error obteniendo perfil:", error);
     throw error;
   }
 };
@@ -106,10 +103,8 @@ export const updateUserData = async (
       ...updates,
       updatedAt: serverTimestamp()
     });
-    console.log("✅ Datos actualizados para:", userId);
     
   } catch (error) {
-    console.error("❌ Error actualizando datos:", error);
     throw error;
   }
 };
@@ -137,12 +132,9 @@ export const addPaymentMethod = async (
       metodosPago: metodosActuales,
       updatedAt: serverTimestamp()
     });
-    
-    console.log(`✅ Método ${metodoId} agregado`);
     return metodo;
     
   } catch (error) {
-    console.error("❌ Error agregando método:", error);
     throw error;
   }
 };
@@ -165,10 +157,7 @@ export const removePaymentMethod = async (userId: string, metodoId: string) => {
       updatedAt: serverTimestamp()
     });
     
-    console.log(`✅ Método ${metodoId} eliminado`);
-    
   } catch (error) {
-    console.error("❌ Error eliminando método:", error);
     throw error;
   }
 };
@@ -202,12 +191,9 @@ export const addNewOrder = async (
       pedidos: pedidosActuales,
       updatedAt: serverTimestamp()
     });
-    
-    console.log(`✅ Pedido ${pedidoId} agregado`);
     return pedidoCompleto;
     
   } catch (error) {
-    console.error("❌ Error agregando pedido:", error);
     throw error;
   }
 };
@@ -257,10 +243,7 @@ export const addProductToOrder = async (
       updatedAt: serverTimestamp()
     });
     
-    console.log(`✅ Producto ${productoId} agregado al pedido ${pedidoId}`);
-    
   } catch (error) {
-    console.error("❌ Error agregando producto:", error);
     throw error;
   }
 };
@@ -279,10 +262,7 @@ export const updateOrderStatus = async (
       updatedAt: serverTimestamp()
     });
     
-    console.log(`✅ Pedido ${pedidoId} actualizado a: ${nuevoEstado}`);
-    
   } catch (error) {
-    console.error("❌ Error actualizando pedido:", error);
     throw error;
   }
 };
@@ -321,7 +301,6 @@ export const getUserPaymentMethodsArray = async (userId: string) => {
     }));
     
   } catch (error) {
-    console.error("❌ Error obteniendo métodos:", error);
     throw error;
   }
 };
@@ -333,7 +312,6 @@ export const getTotalOrders = async (userId: string) => {
     if (!profile || !profile.pedidos) return 0;
     return Object.keys(profile.pedidos).length;
   } catch (error) {
-    console.error("❌ Error obteniendo total de pedidos:", error);
     return 0;
   }
 };
@@ -349,7 +327,6 @@ export const getTotalSpent = async (userId: string) => {
     }, 0);
     
   } catch (error) {
-    console.error("❌ Error obteniendo total gastado:", error);
     return 0;
   }
 };
@@ -412,12 +389,9 @@ export const createOrderFromCart = async (
       pedidos: pedidosActuales,
       updatedAt: serverTimestamp()
     });
-    
-    console.log(`✅ Pedido ${pedidoId} creado con ${items.length} productos`);
     return { pedidoId, ...nuevoPedido };
     
   } catch (error) {
-    console.error("❌ Error creando pedido:", error);
     throw error;
   }
 };
@@ -448,7 +422,6 @@ export const processPurchase = async (
   }
 ) => {
   try {
-    console.log("🛒 Procesando compra para usuario:", userId);
     
     // 1. Guardar método de pago
     let metodoPagoId = purchaseData.metodoPagoId;
@@ -486,7 +459,6 @@ export const processPurchase = async (
     };
     
   } catch (error) {
-    console.error("❌ Error procesando compra:", error);
     throw error;
   }
 };

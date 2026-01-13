@@ -85,32 +85,6 @@ export default function OrdersPopup({ open, onClose, userId, lang }: OrdersPopup
     cancelled: lang === "en" ? "Cancelled" : "Cancelado"
   };
 
-  const getStatusColor = (status: string) => {
-    switch(status?.toLowerCase()) {
-      case "completado":
-      case "completed":
-        return "success";
-      case "cancelado":
-      case "cancelled":
-        return "error";
-      default:
-        return "warning";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch(status?.toLowerCase()) {
-      case "completado":
-      case "completed":
-        return t.completed;
-      case "cancelado":
-      case "cancelled":
-        return t.cancelled;
-      default:
-        return t.pending;
-    }
-  };
-
   return (
     <Dialog 
       open={open} 
@@ -158,12 +132,6 @@ export default function OrdersPopup({ open, onClose, userId, lang }: OrdersPopup
                   </Box>
                   
                   <Box sx={{ textAlign: 'right' }}>
-                    <Chip 
-                      label={getStatusText(order.estado)} 
-                      color={getStatusColor(order.estado) as any}
-                      size="small"
-                      sx={{ mb: 1 }}
-                    />
                     <Typography variant="h6" color="primary">
                       ${order.total?.toFixed(2) || "0.00"}
                     </Typography>
